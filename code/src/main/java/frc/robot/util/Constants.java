@@ -16,11 +16,13 @@ public class Constants {
         public static final CANBus RIO_BUS = new CANBus("rio");
     }
 
-    public static class ShooterConstants {
-
-    }
-
-    public static class IndexConstants {
+    public static class DumpConstants {
+        public static final int LEFT_ROLLER_ID = 1;
+        public static final int LEFT_FOLLOWER_ROLLER_ID = 2;
+        public static final int RIGHT_ROLLER_ID = 3;
+        public static final int RIGHT_FOLLOWER_ROLLER_ID = 4;
+        public static final int FLOOR_ID = 5;
+        public static final int FLOOR_FOLLOWER_ID = 6;
 
     }
 
