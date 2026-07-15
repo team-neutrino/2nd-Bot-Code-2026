@@ -18,12 +18,18 @@ public class Constants {
 
     public static class DumpConstants {
         public static final int LEFT_ROLLER_ID = 1;
-        public static final int LEFT_FOLLOWER_ROLLER_ID = 2;
+        public static final int LEFT_ROLLER_FOLLOWER_ID = 2;
         public static final int RIGHT_ROLLER_ID = 3;
-        public static final int RIGHT_FOLLOWER_ROLLER_ID = 4;
+        public static final int RIGHT_ROLLER_FOLLOWER_ID = 4;
         public static final int FLOOR_ID = 5;
         public static final int FLOOR_FOLLOWER_ID = 6;
 
+        public static final int ROLLER_CURRENT_LIMIT = 40;
+        public static final int FLOOR_CURRENT_LIMIT = 30;
+
+        public static final double ROLLER_KP = 0;
+        public static final double ROLLER_KI = 0;
+        public static final double ROLLER_KD = 0;
     }
 
     public static class IntakeConstants {
