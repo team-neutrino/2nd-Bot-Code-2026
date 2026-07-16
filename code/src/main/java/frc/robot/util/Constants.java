@@ -23,7 +23,6 @@ public class Constants {
         public static final int RIGHT_FOLLOWER_ROLLER_ID = 4;
         public static final int FLOOR_ID = 5;
         public static final int FLOOR_FOLLOWER_ID = 6;
-
     }
 
     public static class IntakeConstants {
@@ -31,7 +30,18 @@ public class Constants {
     }
 
     public static class LimelightConstants {
+        public static final String LL = "limelight";
 
+        public static final double LL_FORWARD_OFFSET = 0.070646; // not real values
+        public static final double LL_SIDE_OFFSET = -0.000635;
+        public static final double LL_HEIGHT_OFFSET = 0.745832;
+        public static final double LL_ROLL_OFFSET = 0.0;
+        public static final double LL_PITCH_OFFSET = 27.5;
+        public static final double LL_YAW_OFFSET = 0.0; 
+
+        public static final double LL_MODEL = 4; // change this depending on how good of a limelight design puts on there
+
+        public static final double EXTERNAL_WEIGHT = 0.01; // larger number (0-1) = lower trust in internal IMU
     }
 
     public static class SwerveConstants {
