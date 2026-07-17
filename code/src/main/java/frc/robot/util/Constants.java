@@ -4,14 +4,23 @@
 
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.*;
+
+
 import java.util.List;
+import java.util.Optional;
 
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.generated.TunerConstants;
 
 public class Constants {
+    public static class GlobalConstants {
+            public static Optional<Boolean> RED_ALLIANCE = Optional.empty();
+    }
+
     public static class RioConstants {
         public static final CANBus RIO_BUS = new CANBus("rio");
     }
@@ -35,7 +44,16 @@ public class Constants {
     }
 
     public static class SwerveConstants {
+        public static final double MAX_SPEED = 5.7;
+        public static final double MAX_ROTATION_SPEED = 6.0;
+        public static final double SLOW_MAX_SPEED = 2.0;
+        public static final double SLOW_MAX_ROTATION_SPEED = 4.0;
 
+        public static final double SWERVE_P = 4.0;
+        public static final double SWERVE_I = 0.0;
+        public static final double SWERVE_D = 0.0;
+
+        public static final double SLEW_LIMIT = 4.0;
     }
 
     public static class FieldMeasurementConstants {

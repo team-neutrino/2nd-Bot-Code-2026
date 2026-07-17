@@ -10,10 +10,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.GlobalConstants;
-import frc.robot.Telemetry;
-import frc.robot.util.generated.CommandSwerveDrivetrain;
-import frc.robot.util.generated.TunerConstants;
+import frc.robot.util.Constants.GlobalConstants;
+import frc.robot.generated.Telemetry;
+import frc.robot.generated.CommandSwerveDrivetrain;
+import frc.robot.generated.TunerConstants;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
@@ -24,8 +24,9 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 
-import static frc.robot.Constants.SwerveConstants.*;
+import static frc.robot.util.Constants.SwerveConstants.*;
 
 import java.io.IOException;
 
@@ -34,6 +35,9 @@ import org.json.simple.parser.ParseException;
 public class Swerve extends CommandSwerveDrivetrain {
   private Telemetry m_telemetry = new Telemetry(MAX_SPEED);
   private RobotConfig m_robotConfig;
+  private SlewRateLimiter m_slewLimit = new SlewRateLimiter(SLEW_LIMIT, -Integer.MAX_VALUE, 0);
+  private double joystickVx;
+  private double joystickVy;
 
   public Swerve() {
     super(TunerConstants.DrivetrainConstants, TunerConstants.FrontLeft, TunerConstants.FrontRight,
@@ -109,16 +113,36 @@ public class Swerve extends CommandSwerveDrivetrain {
             .withRotationalRate(speeds.omegaRadiansPerSecond));
   }
 
-  public Command defaultCommand(CommandXboxController driverController) {
-    return applyRequest(() -> SwerveRequestStash.drive.withVelocityX(-driverController.getLeftY() * MAX_SPEED)
-        .withVelocityY(-driverController.getLeftX() * MAX_SPEED)
-        .withRotationalRate(-driverController.getRightX() * MAX_ANGULAR_RATE));
+  public Command defaultCommand(CommandXboxController joystick) {
+        return run(() -> {
+            double forward = -joystick.getLeftY();
+            double left = -joystick.getLeftX();
+            double rotation = -joystick.getRightX();
+            double magnitude = Math.hypot(forward, left) * MAX_SPEED;
+            magnitude = m_slewLimit.calculate(magnitude);
+            joystickVx = forward * magnitude;
+            joystickVy = left * magnitude;
+            setControl(SwerveRequestStash.drive
+                    .withVelocityY(joystickVy)
+                    .withVelocityX(joystickVx)
+                    .withRotationalRate(rotation * MAX_ROTATION_SPEED));
+        });
   }
 
-  public Command slowDriveCommand(CommandXboxController driverController) {
-    return applyRequest(() -> SwerveRequestStash.drive.withVelocityX(-driverController.getLeftY() * SLOW_SPEED)
-        .withVelocityY(-driverController.getLeftX() * SLOW_SPEED)
-        .withRotationalRate(-driverController.getRightX() * SLOW_ANGULAR_RATE));
+  public Command slowDriveCommand(CommandXboxController joystick) {
+    return run(() -> {
+        double forward = -joystick.getLeftY();
+        double left = -joystick.getLeftX();
+        double rotation = -joystick.getRightX();
+        double magnitude = Math.hypot(forward, left) * SLOW_MAX_SPEED;
+        magnitude = m_slewLimit.calculate(magnitude);
+        joystickVx = forward * magnitude;
+        joystickVy = left * magnitude;
+        setControl(SwerveRequestStash.drive
+                .withVelocityY(joystickVy)
+                .withVelocityX(joystickVx)
+                .withRotationalRate(rotation * SLOW_MAX_ROTATION_SPEED));
+    });
   }
 
   public void setVelocity(double xVelocity, double yVelocity, Rotation2d targetDirection) {
@@ -130,12 +154,12 @@ public class Swerve extends CommandSwerveDrivetrain {
   }
 
   public void configureRequestPID() {
-    SwerveRequestStash.driveWithVelocity.HeadingController.setPID(DRIVE_TO_POINT_P, DRIVE_TO_POINT_I, DRIVE_TO_POINT_D);
+    SwerveRequestStash.driveWithVelocity.HeadingController.setPID(SWERVE_P, SWERVE_I, SWERVE_D);
   }
 
   public class SwerveRequestStash {
     public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-        .withDeadband(MAX_SPEED * 0.1).withRotationalDeadband(MAX_ANGULAR_RATE * 0.1)
+        .withDeadband(MAX_SPEED * 0.1).withRotationalDeadband(MAX_ROTATION_SPEED * 0.1)
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     public static final SwerveRequest.FieldCentricFacingAngle driveWithVelocity = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withForwardPerspective(ForwardPerspectiveValue.BlueAlliance);
