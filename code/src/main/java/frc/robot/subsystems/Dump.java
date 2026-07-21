@@ -35,6 +35,13 @@ public class Dump extends SubsystemBase {
   private VelocityVoltage m_floorVelControl;
 
   public Dump() {
+    m_leftRollerConfig = new TalonFXConfiguration();
+    m_rightRollerConfig = new TalonFXConfiguration();
+    m_floorConfig = new TalonFXConfiguration();
+
+    m_rollerCurrentConfig = new CurrentLimitsConfigs();
+    m_floorCurrentConfig = new CurrentLimitsConfigs();
+
     m_leftRoller = new TalonFX(LEFT_ROLLER_ID, RIO_BUS);
     m_leftRollerFollow = new TalonFX(LEFT_ROLLER_FOLLOWER_ID, RIO_BUS);
     m_rightRoller = new TalonFX(RIGHT_ROLLER_ID, RIO_BUS);
