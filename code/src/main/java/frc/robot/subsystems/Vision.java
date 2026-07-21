@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
+import frc.robot.util.LimelightHelpers.RawFiducial;
 
 import static frc.robot.util.Constants.LimelightConstants.*;
 import static frc.robot.util.Constants.FieldMeasurementConstants.*;
+import static frc.robot.util.Constants.AprilTagConstants.*;
 import static frc.robot.util.Subsystems.swerve;
 
 public class Vision extends SubsystemBase {
@@ -131,6 +133,27 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  public void updateHubTagCount(PoseEstimate estimate) {
+    if (estimate == null) {
+      m_hubTagCount = 0;
+      return;
+    }
+
+    int count = 0;
+
+    for (RawFiducial fiducial : estimate.rawFiducials) {
+      if (ALL_HUB_TAGS.contains(fiducial.id)) {
+        count += 1;
+      }
+    }
+
+    m_hubTagCount = count;
+  }
+
+  public boolean hasTwoHubTags() {
+    return m_hubTagCount > 1;
+  }
+  
   @Override
   public void periodic() {
     if (swerve == null) {
@@ -138,6 +161,7 @@ public class Vision extends SubsystemBase {
     }
 
     updateFusionMT();
+    updateHubTagCount(m_estimateMT2);
     m_lastPose = m_currentPose;
   }
 }
