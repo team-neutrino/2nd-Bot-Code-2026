@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.command_factories.DumpFactory;
 import frc.robot.util.Subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,7 +28,8 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+    m_buttonController.a().whileTrue(DumpFactory.runRollers());
+    m_buttonController.b().whileTrue(DumpFactory.runFloor());
   }
 
   private void configureNamedCommands() {
