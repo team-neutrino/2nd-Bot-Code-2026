@@ -3,12 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import static frc.robot.util.Constants.RioConstants.*;
 import static frc.robot.util.Constants.DumpConstants.*;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Dump extends SubsystemBase {
@@ -27,6 +29,10 @@ public class Dump extends SubsystemBase {
   private CurrentLimitsConfigs m_floorCurrentConfig;
 
   private double m_rollerTargetRPM;
+  private double m_floorTargetRPM;
+
+  private VelocityVoltage m_rollerVelControl;
+  private VelocityVoltage m_floorVelControl;
 
   public Dump() {
     m_leftRoller = new TalonFX(LEFT_ROLLER_ID, RIO_BUS);
@@ -44,6 +50,7 @@ public class Dump extends SubsystemBase {
     m_leftRollerConfig.Slot0.kP = ROLLER_KP;
     m_leftRollerConfig.Slot0.kI = ROLLER_KI;
     m_leftRollerConfig.Slot0.kD = ROLLER_KD;
+    m_leftRollerConfig.Slot0.kV = ROLLER_KV;
     m_leftRollerConfig.CurrentLimits = m_rollerCurrentConfig;
 
     m_rightRollerConfig = m_leftRollerConfig;
@@ -62,6 +69,9 @@ public class Dump extends SubsystemBase {
     m_rightRollerFollow.setControl(rightFollowReq);
     Follower floorFollowReq = new Follower(FLOOR_ID, MotorAlignmentValue.Opposed);
     m_floorFollow.setControl(floorFollowReq);
+
+    m_rollerVelControl = new VelocityVoltage(0);
+    m_floorVelControl = new VelocityVoltage(0);
   }
 
   public void setRollerPID(double new_P, double new_I, double new_D) {
@@ -82,7 +92,23 @@ public class Dump extends SubsystemBase {
     return m_rollerTargetRPM;
   }
 
+  public Command setRollerRPM(double rpm) {
+    return run(() -> {
+      m_rollerTargetRPM = rpm;
+    });
+  }
+
+  public Command setFloorRPM(double rpm) {
+    return run(() -> {
+      m_rollerTargetRPM = rpm;
+    });
+  }
+
   @Override
   public void periodic() {
+    m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+    m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+    m_floor.setControl(m_floorVelControl.withVelocity(m_floorTargetRPM / 60));
+
   }
 }
