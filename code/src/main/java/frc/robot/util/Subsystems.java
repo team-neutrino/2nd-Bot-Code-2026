@@ -7,5 +7,5 @@ public class Subsystems {
     public static final Intake intake = new IntakeNT();
     public static final Vision vision = new Vision();
     public static final Swerve swerve = new Swerve();
-    public static final Dump shooter = new DumpNT();
+    public static final Dump dump = new DumpNT();
 }
