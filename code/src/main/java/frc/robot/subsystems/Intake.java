@@ -1,6 +1,16 @@
 package frc.robot.subsystems;
 
+import static frc.robot.util.Constants.IntakeConstants.*;
+import static frc.robot.util.Constants.RioConstants.*;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -8,12 +18,73 @@ public class Intake extends SubsystemBase {
   private TalonFX m_deployMotor;
   private TalonFX m_rollerMotor;
   private TalonFX m_rollerFollower;
+  private TalonFXConfiguration m_deployMotorConfig;
+  private TalonFXConfiguration m_rollerMotorConfig;
+  private CurrentLimitsConfigs m_deployCurrentLimitsConfig;
+  private CurrentLimitsConfigs m_rollerCurrentLimitsConfig;
+
+  private PositionVoltage m_deployPositionControl;
+  private VoltageOut m_rollerVoltageControl;
+
+  private double m_rollerMotorVoltage;
+  private double m_targetDeployAngle;
 
   public Intake() {
+    m_deployMotor = new TalonFX(DEPLOY_MOTOR_ID, RIO_BUS);
+    m_rollerMotor = new TalonFX(ROLLER_MOTOR_ID, RIO_BUS);
+    m_rollerFollower = new TalonFX(ROLLER_FOLLOWER_ID, RIO_BUS);
+    m_deployMotorConfig = new TalonFXConfiguration();
+    m_rollerMotorConfig = new TalonFXConfiguration();
+    m_deployCurrentLimitsConfig = new CurrentLimitsConfigs();
+    m_rollerCurrentLimitsConfig = new CurrentLimitsConfigs();
 
+    m_deployCurrentLimitsConfig.withSupplyCurrentLimit(DEPLOY_CURRENT_LIMIT)
+        .withSupplyCurrentLimitEnable(true)
+        .withStatorCurrentLimit(DEPLOY_CURRENT_LIMIT)
+        .withStatorCurrentLimitEnable(true);
+    m_rollerCurrentLimitsConfig.withSupplyCurrentLimit(ROLLER_CURRENT_LIMIT)
+        .withSupplyCurrentLimitEnable(true)
+        .withStatorCurrentLimit(ROLLER_CURRENT_LIMIT)
+        .withStatorCurrentLimitEnable(true);
+    m_deployMotorConfig.CurrentLimits = m_deployCurrentLimitsConfig;
+    m_rollerMotorConfig.CurrentLimits = m_rollerCurrentLimitsConfig;
+
+    m_deployMotorConfig.Slot0.kP = INTAKE_kP;
+    m_deployMotorConfig.Slot0.kI = INTAKE_kI;
+    m_deployMotorConfig.Slot0.kD = INTAKE_kD;
+
+    m_rollerMotor.getConfigurator().apply(m_rollerMotorConfig);
+    m_rollerFollower.getConfigurator().apply(m_rollerMotorConfig);
+    m_deployMotor.getConfigurator().apply(m_deployMotorConfig);
+    m_rollerMotor.setNeutralMode(NeutralModeValue.Coast);
+    m_rollerFollower.setNeutralMode(NeutralModeValue.Coast);
+    m_deployMotor.setNeutralMode(NeutralModeValue.Coast);
+    m_deployMotor.setPosition(0);
+
+    Follower followRequest = new Follower(ROLLER_MOTOR_ID, MotorAlignmentValue.Opposed);
+    m_rollerFollower.setControl(followRequest);
+  }
+
+  public double getMotorAngle() {
+    return m_deployMotor.getPosition().getValueAsDouble();
+  }
+
+  public double getTargetAngle() {
+    return m_targetDeployAngle;
+  }
+
+  private void moveToIntake(double targetPosition) {
+    m_deployMotor.setControl(m_deployPositionControl.withPosition(targetPosition));
+  }
+
+  private void spinRoller(double voltage) {
+    m_rollerVoltageControl.EnableFOC = true;
+    m_rollerMotor.setControl(m_rollerVoltageControl.withOutput(voltage));
   }
 
   @Override
   public void periodic() {
+    spinRoller(m_rollerMotorVoltage);
+    moveToIntake(m_targetDeployAngle);
   }
 }
