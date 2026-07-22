@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import static frc.robot.util.Constants.RioConstants.*;
@@ -21,9 +23,11 @@ public class Dump extends SubsystemBase {
   private TalonFX m_floor;
   private TalonFX m_floorFollow;
 
-  private TalonFXConfiguration m_leftRollerConfig;
-  private TalonFXConfiguration m_rightRollerConfig;
-  private TalonFXConfiguration m_floorConfig;
+  private TalonFXConfiguration m_rollerConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration m_leftRollerConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration m_rightRollerConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration m_floorConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration m_rollerFollowerConfig = new TalonFXConfiguration();
 
   private CurrentLimitsConfigs m_rollerCurrentConfig;
   private CurrentLimitsConfigs m_floorCurrentConfig;
@@ -34,11 +38,9 @@ public class Dump extends SubsystemBase {
   private VelocityVoltage m_rollerVelControl;
   private VelocityVoltage m_floorVelControl;
 
-  public Dump() {
-    m_leftRollerConfig = new TalonFXConfiguration();
-    m_rightRollerConfig = new TalonFXConfiguration();
-    m_floorConfig = new TalonFXConfiguration();
+  private Slot0Configs m_PIDConfig = new Slot0Configs();
 
+  public Dump() {
     m_rollerCurrentConfig = new CurrentLimitsConfigs();
     m_floorCurrentConfig = new CurrentLimitsConfigs();
 
@@ -54,25 +56,37 @@ public class Dump extends SubsystemBase {
     m_floorCurrentConfig.withSupplyCurrentLimit(FLOOR_CURRENT_LIMIT).withSupplyCurrentLimitEnable(true)
         .withStatorCurrentLimit(FLOOR_CURRENT_LIMIT).withStatorCurrentLimitEnable(true);
 
-    m_leftRollerConfig.Slot0.kP = ROLLER_KP;
-    m_leftRollerConfig.Slot0.kI = ROLLER_KI;
-    m_leftRollerConfig.Slot0.kD = ROLLER_KD;
-    m_leftRollerConfig.Slot0.kV = ROLLER_KV;
-    m_leftRollerConfig.CurrentLimits = m_rollerCurrentConfig;
+    m_rollerConfig.Slot0.kP = ROLLER_KP;
+    m_rollerConfig.Slot0.kI = ROLLER_KI;
+    m_rollerConfig.Slot0.kD = ROLLER_KD;
+    m_rollerConfig.Slot0.kV = ROLLER_KV;
+    m_rollerConfig.CurrentLimits = m_rollerCurrentConfig;
 
-    m_rightRollerConfig = m_leftRollerConfig;
+    m_leftRollerConfig = m_rollerConfig.clone();
+    m_leftRollerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    m_rightRollerConfig = m_rollerConfig.clone();
+    m_rightRollerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    m_floorConfig.Slot0.kP = FLOOR_KP;
+    m_floorConfig.Slot0.kI = FLOOR_KI;
+    m_floorConfig.Slot0.kD = FLOOR_KD;
+    m_floorConfig.Slot0.kV = FLOOR_KV;
+    m_floorConfig.CurrentLimits = m_floorCurrentConfig;
+
+    m_rollerFollowerConfig.CurrentLimits = m_rollerCurrentConfig;
 
     m_leftRoller.getConfigurator().apply(m_leftRollerConfig);
-    m_leftRollerFollow.getConfigurator().apply(m_leftRollerConfig);
+    m_leftRollerFollow.getConfigurator().apply(m_rollerFollowerConfig);
     m_rightRoller.getConfigurator().apply(m_rightRollerConfig);
-    m_rightRollerFollow.getConfigurator().apply(m_rightRollerConfig);
+    m_rightRollerFollow.getConfigurator().apply(m_rollerFollowerConfig);
 
-    m_floorConfig.CurrentLimits = m_floorCurrentConfig;
     m_floor.getConfigurator().apply(m_floorConfig);
+    m_floorFollow.getConfigurator().apply(m_floorConfig);
 
-    Follower leftFollowReq = new Follower(LEFT_ROLLER_ID, MotorAlignmentValue.Opposed);
+    Follower leftFollowReq = new Follower(LEFT_ROLLER_ID, MotorAlignmentValue.Aligned);
     m_leftRollerFollow.setControl(leftFollowReq);
-    Follower rightFollowReq = new Follower(RIGHT_ROLLER_ID, MotorAlignmentValue.Opposed);
+    Follower rightFollowReq = new Follower(RIGHT_ROLLER_ID, MotorAlignmentValue.Aligned);
     m_rightRollerFollow.setControl(rightFollowReq);
     Follower floorFollowReq = new Follower(FLOOR_ID, MotorAlignmentValue.Opposed);
     m_floorFollow.setControl(floorFollowReq);
@@ -82,13 +96,13 @@ public class Dump extends SubsystemBase {
   }
 
   public void setRollerPID(double new_P, double new_I, double new_D) {
-    m_leftRollerConfig.Slot0.kP = new_P;
-    m_leftRollerConfig.Slot0.kI = new_I;
-    m_leftRollerConfig.Slot0.kD = new_D;
+    m_PIDConfig.kP = new_P;
+    m_PIDConfig.kI = new_I;
+    m_PIDConfig.kD = new_D;
+    m_PIDConfig.kV = ROLLER_KV;
 
-    m_rightRollerConfig = m_leftRollerConfig;
-    m_leftRoller.getConfigurator().apply(m_leftRollerConfig);
-    m_rightRoller.getConfigurator().apply(m_rightRollerConfig);
+    m_leftRoller.getConfigurator().apply(m_PIDConfig);
+    m_rightRoller.getConfigurator().apply(m_PIDConfig);
   }
 
   public double getRollerRPM() {
@@ -100,14 +114,14 @@ public class Dump extends SubsystemBase {
   }
 
   public Command setRollerRPM(double rpm) {
-    return run(() -> {
+    return runOnce(() -> {
       m_rollerTargetRPM = rpm;
     });
   }
 
   public Command setFloorRPM(double rpm) {
-    return run(() -> {
-      m_rollerTargetRPM = rpm;
+    return runOnce(() -> {
+      m_floorTargetRPM = rpm;
     });
   }
 
@@ -116,6 +130,5 @@ public class Dump extends SubsystemBase {
     m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
     m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
     m_floor.setControl(m_floorVelControl.withVelocity(m_floorTargetRPM / 60));
-
   }
 }
