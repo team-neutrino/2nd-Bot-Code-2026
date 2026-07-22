@@ -1,3 +1,4 @@
+
 package frc.robot.subsystems;
 
 import static frc.robot.util.Constants.IntakeConstants.*;
@@ -64,6 +65,9 @@ public class Intake extends SubsystemBase {
     m_deployMotor.setNeutralMode(NeutralModeValue.Coast);
     m_deployMotor.setPosition(0);
 
+    m_deployPositionControl = new PositionVoltage(0);
+    m_rollerVoltageControl = new VoltageOut(0);
+
     Follower followRequest = new Follower(ROLLER_MOTOR_ID, MotorAlignmentValue.Opposed);
     m_rollerFollower.setControl(followRequest);
 
@@ -98,9 +102,9 @@ public class Intake extends SubsystemBase {
 
   private void checkIsDeployed() {
     if (m_isDeployed) {
-      m_targetDeployAngle = 0; // 0 should be changed when deploy angle is tested
+      m_targetDeployAngle = DEPLOYED_POSITION; // 0 should be changed when deploy angle is tested
     } else {
-      m_targetDeployAngle = 0;
+      m_targetDeployAngle = STARTING_POSITION;
     }
   }
 

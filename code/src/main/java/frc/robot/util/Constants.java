@@ -38,8 +38,8 @@ public class Constants {
         public static final double OUTTAKE_VOLTAGE = -10.0; // Needs to be tested
 
         public static final double STARTING_POSITION = 0.0;
-        public static final double DEPLOYED_POSITION = 0.0; // Needs to be tested
-        public static final double ALLOWED_TARGET_ERROR = 0.0; // Needs to be tested
+        public static final double DEPLOYED_POSITION = 10.0; // Needs to be tested
+        public static final double ALLOWED_TARGET_ERROR = 0.5; // Needs to be tested
 
         public static final double INTAKE_kP = 0.0; // Needs to be tested
         public static final double INTAKE_kI = 0.0;

@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.util.Subsystems.intake;
 
 public class IntakeFactory {
+
+    // Figure out button bindings (for these and in general)
+
     public static Command runIntake() {
         return intake.runIntake(INTAKE_VOLTAGE);
     }

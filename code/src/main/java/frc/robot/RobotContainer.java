@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import frc.robot.command_factories.IntakeFactory;
+import frc.robot.subsystems.Intake;
 import frc.robot.util.Subsystems;
+import static frc.robot.util.Subsystems.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -23,7 +27,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-
+    intake.setDefaultCommand(intake.defaultCommand());
   }
 
   private void configureBindings() {
