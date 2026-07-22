@@ -14,4 +14,8 @@ public class DumpFactory {
     public static Command runFloor() {
         return dump.setFloorRPM(DEFAULT_FLOOR_RPM);
     }
+
+    public static Command runBoth() {
+        return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setFloorRPM(DEFAULT_FLOOR_RPM));
+    }
 }

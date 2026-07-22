@@ -38,8 +38,6 @@ public class Dump extends SubsystemBase {
   private VelocityVoltage m_rollerVelControl;
   private VelocityVoltage m_floorVelControl;
 
-  private Slot0Configs m_PIDConfig = new Slot0Configs();
-
   public Dump() {
     m_rollerCurrentConfig = new CurrentLimitsConfigs();
     m_floorCurrentConfig = new CurrentLimitsConfigs();
@@ -96,13 +94,14 @@ public class Dump extends SubsystemBase {
   }
 
   public void setRollerPID(double new_P, double new_I, double new_D) {
-    m_PIDConfig.kP = new_P;
-    m_PIDConfig.kI = new_I;
-    m_PIDConfig.kD = new_D;
-    m_PIDConfig.kV = ROLLER_KV;
+    Slot0Configs slot0Config = new Slot0Configs();
+    slot0Config.kP = new_P;
+    slot0Config.kI = new_I;
+    slot0Config.kD = new_D;
+    slot0Config.kV = ROLLER_KV;
 
-    m_leftRoller.getConfigurator().apply(m_PIDConfig);
-    m_rightRoller.getConfigurator().apply(m_PIDConfig);
+    m_leftRoller.getConfigurator().apply(slot0Config);
+    m_rightRoller.getConfigurator().apply(slot0Config);
   }
 
   public double getRollerRPM() {
@@ -113,15 +112,26 @@ public class Dump extends SubsystemBase {
     return m_rollerTargetRPM;
   }
 
+  public Command stopCommand() {
+    return run(() -> {
+      m_rollerTargetRPM = 0;
+      m_floorTargetRPM = 0;
+    });
+  }
+
   public Command setRollerRPM(double rpm) {
-    return runOnce(() -> {
+    return startEnd(() -> {
       m_rollerTargetRPM = rpm;
+    }, () -> {
+      m_rollerTargetRPM = 0;
     });
   }
 
   public Command setFloorRPM(double rpm) {
-    return runOnce(() -> {
+    return startEnd(() -> {
       m_floorTargetRPM = rpm;
+    }, () -> {
+      m_floorTargetRPM = 0;
     });
   }
 
