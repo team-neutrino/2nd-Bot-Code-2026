@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
@@ -28,6 +29,8 @@ public class Intake extends SubsystemBase {
 
   private double m_rollerMotorVoltage;
   private double m_targetDeployAngle;
+
+  private boolean m_isDeployed;
 
   public Intake() {
     m_deployMotor = new TalonFX(DEPLOY_MOTOR_ID, RIO_BUS);
@@ -63,6 +66,8 @@ public class Intake extends SubsystemBase {
 
     Follower followRequest = new Follower(ROLLER_MOTOR_ID, MotorAlignmentValue.Opposed);
     m_rollerFollower.setControl(followRequest);
+
+    m_isDeployed = false;
   }
 
   public double getMotorAngle() {
@@ -71,6 +76,15 @@ public class Intake extends SubsystemBase {
 
   public double getTargetAngle() {
     return m_targetDeployAngle;
+  }
+
+  public double getRollerRPM() {
+    return m_rollerMotor.getVelocity().getValueAsDouble() * 60;
+  }
+
+  public boolean isAtTarget() {
+    return getMotorAngle() >= getTargetAngle() - ALLOWED_TARGET_ERROR
+        && getMotorAngle() <= getTargetAngle() + ALLOWED_TARGET_ERROR;
   }
 
   private void moveToIntake(double targetPosition) {
@@ -82,9 +96,50 @@ public class Intake extends SubsystemBase {
     m_rollerMotor.setControl(m_rollerVoltageControl.withOutput(voltage));
   }
 
+  private void checkIsDeployed() {
+    if (m_isDeployed) {
+      m_targetDeployAngle = 0; // 0 should be changed when deploy angle is tested
+    } else {
+      m_targetDeployAngle = 0;
+    }
+  }
+
+  public void setIntakePID(double new_P, double new_I, double new_D) {
+    m_deployMotorConfig.Slot0.kP = new_P;
+    m_deployMotorConfig.Slot0.kI = new_I;
+    m_deployMotorConfig.Slot0.kD = new_D;
+
+    m_deployMotor.getConfigurator().apply(m_deployMotorConfig);
+  }
+
   @Override
   public void periodic() {
+    checkIsDeployed();
     spinRoller(m_rollerMotorVoltage);
     moveToIntake(m_targetDeployAngle);
+  }
+
+  public Command runIntake(double voltage) {
+    return run(() -> {
+      m_rollerMotorVoltage = voltage;
+    });
+  }
+
+  public Command deployIntake() {
+    return run(() -> {
+      m_isDeployed = true;
+    });
+  }
+
+  public Command retractIntake() {
+    return run(() -> {
+      m_isDeployed = false;
+    });
+  }
+
+  public Command defaultCommand() {
+    return run(() -> {
+      m_rollerMotorVoltage = 0;
+    });
   }
 }
