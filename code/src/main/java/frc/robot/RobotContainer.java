@@ -21,6 +21,7 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
+    dump.setDefaultCommand(dump.stopCommand());
   }
 
   private void configureBindings() {

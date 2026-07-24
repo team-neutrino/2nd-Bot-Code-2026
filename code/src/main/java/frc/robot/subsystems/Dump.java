@@ -113,25 +113,40 @@ public class Dump extends SubsystemBase {
   }
 
   public Command stopCommand() {
+    System.out.println("yo im running");
     return run(() -> {
       m_rollerTargetRPM = 0;
       m_floorTargetRPM = 0;
     });
   }
 
+  // public Command setRollerRPM(double rpm) {
+  // return startEnd(() -> {
+  // m_rollerTargetRPM = rpm;
+  // }, () -> {
+  // m_rollerTargetRPM = 0;
+  // });
+  // }
+
+  // public Command setFloorRPM(double rpm) {
+  // return startEnd(() -> {
+  // m_floorTargetRPM = rpm;
+  // }, () -> {
+  // m_floorTargetRPM = 0;
+  // });
+  // }
+
   public Command setRollerRPM(double rpm) {
-    return startEnd(() -> {
+    return run(() -> {
       m_rollerTargetRPM = rpm;
-    }, () -> {
-      m_rollerTargetRPM = 0;
+
     });
   }
 
   public Command setFloorRPM(double rpm) {
-    return startEnd(() -> {
+    return run(() -> {
       m_floorTargetRPM = rpm;
-    }, () -> {
-      m_floorTargetRPM = 0;
+
     });
   }
 
