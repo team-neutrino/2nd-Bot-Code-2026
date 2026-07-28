@@ -104,6 +104,16 @@ public class Dump extends SubsystemBase {
     m_rightRoller.getConfigurator().apply(slot0Config);
   }
 
+  public void setFloorPID(double new_P, double new_I, double new_D) {
+    Slot0Configs slot0Config2 = new Slot0Configs();
+    slot0Config2.kP = new_P;
+    slot0Config2.kI = new_I;
+    slot0Config2.kD = new_D;
+    slot0Config2.kV = ROLLER_KV;
+
+    m_floor.getConfigurator().apply(slot0Config2);
+  }
+
   public double getRollerRPM() {
     return m_leftRoller.getVelocity().getValueAsDouble() * 60;
   }
