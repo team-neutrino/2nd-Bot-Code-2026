@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -123,47 +124,45 @@ public class Dump extends SubsystemBase {
   }
 
   public Command stopCommand() {
-    System.out.println("yo im running");
     return run(() -> {
       m_rollerTargetRPM = 0;
       m_floorTargetRPM = 0;
     });
   }
 
-  // public Command setRollerRPM(double rpm) {
-  // return startEnd(() -> {
-  // m_rollerTargetRPM = rpm;
-  // }, () -> {
-  // m_rollerTargetRPM = 0;
-  // });
-  // }
-
-  // public Command setFloorRPM(double rpm) {
-  // return startEnd(() -> {
-  // m_floorTargetRPM = rpm;
-  // }, () -> {
-  // m_floorTargetRPM = 0;
-  // });
-  // }
-
   public Command setRollerRPM(double rpm) {
-    return run(() -> {
+    return startEnd(() -> {
       m_rollerTargetRPM = rpm;
-
+    }, () -> {
+      m_rollerTargetRPM = 0;
     });
   }
 
   public Command setFloorRPM(double rpm) {
-    return run(() -> {
+    return startEnd(() -> {
       m_floorTargetRPM = rpm;
-
+    }, () -> {
+      m_floorTargetRPM = 0;
     });
   }
+
+  // public Command setRollerRPM(double rpm) {
+  // return run(() -> {
+  // m_rollerTargetRPM = rpm;
+  // });
+  // }
+
+  // public Command setFloorRPM(double rpm) {
+  // return run(() -> {
+  // m_floorTargetRPM = rpm;
+  // });
+  // }
 
   @Override
   public void periodic() {
     m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
     m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+
     m_floor.setControl(m_floorVelControl.withVelocity(m_floorTargetRPM / 60));
   }
 }
