@@ -12,7 +12,7 @@ public class DumpFactory {
     }
 
     public static Command runFloor() {
-        return dump.setFloorRPM(DEFAULT_FLOOR_RPM);
+        return dump.setFloorRPM(1000);
     }
 
     public static Command runBoth() {
