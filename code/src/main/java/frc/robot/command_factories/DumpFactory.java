@@ -16,6 +16,6 @@ public class DumpFactory {
     }
 
     public static Command runBoth() {
-        return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setFloorRPM(DEFAULT_FLOOR_RPM));
+        return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setFloorRPM(DEFAULT_KICKER_RPM));
     }
 }

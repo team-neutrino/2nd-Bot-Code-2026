@@ -12,7 +12,7 @@ public class DumpNT extends Dump {
     private NetworkTableInstance m_globalNT = NetworkTableInstance.getDefault();
 
     private PIDTuner m_rollerPIDTuner;
-    private PIDTuner m_floorPIDTuner;
+    private PIDTuner m_kickerPIDTuner;
 
     private double m_previousRollerKP;
     private double m_previousRollerKI;
@@ -26,21 +26,21 @@ public class DumpNT extends Dump {
     private DoublePublisher m_rollerTargetRPMPublish;
     private DoubleSubscriber m_rollerTargetRPMSub;
 
-    private DoubleTopic m_floorTargetRPMTopic;
-    private DoublePublisher m_floorTargetRPMPublish;
-    private DoubleSubscriber m_floorTargetRPMSub;
+    private DoubleTopic m_kickerTargetRPMTopic;
+    private DoublePublisher m_kickerTargetRPMPublish;
+    private DoubleSubscriber m_kickerTargetRPMSub;
 
     public DumpNT() {
         m_rollerPIDTuner = new PIDTuner("dump/tuning/roller", false);
-        m_floorPIDTuner = new PIDTuner("dump/tuning/floor", false);
+        m_kickerPIDTuner = new PIDTuner("dump/tuning/floor", false);
 
         m_rollerPIDTuner.setP(ROLLER_KP);
         m_rollerPIDTuner.setI(ROLLER_KI);
         m_rollerPIDTuner.setD(ROLLER_KD);
 
-        m_floorPIDTuner.setP(FLOOR_KP);
-        m_floorPIDTuner.setI(FLOOR_KI);
-        m_floorPIDTuner.setD(FLOOR_KD);
+        m_kickerPIDTuner.setP(KICKER_KP);
+        m_kickerPIDTuner.setI(KICKER_KI);
+        m_kickerPIDTuner.setD(KICKER_KD);
 
         m_rollerTargetRPMTopic = m_globalNT.getDoubleTopic("dump/roller/targetRPM");
         m_rollerTargetRPMPublish = m_rollerTargetRPMTopic.publish();
@@ -50,9 +50,9 @@ public class DumpNT extends Dump {
         m_previousRollerKI = ROLLER_KI;
         m_previousRollerKD = ROLLER_KD;
 
-        m_previousFloorKP = FLOOR_KP;
-        m_previousFloorKI = FLOOR_KI;
-        m_previousFloorKD = FLOOR_KD;
+        m_previousFloorKP = KICKER_KP;
+        m_previousFloorKI = KICKER_KI;
+        m_previousFloorKD = KICKER_KD;
     }
 
     @Override
@@ -67,11 +67,11 @@ public class DumpNT extends Dump {
             setRollerPID(m_rollerPIDTuner.getP(), m_rollerPIDTuner.getI(), m_rollerPIDTuner.getD());
         }
 
-        if (m_floorPIDTuner.isDifferentValues(m_previousFloorKP, m_previousFloorKI, m_previousFloorKD)) {
-            m_previousFloorKP = m_floorPIDTuner.getP();
-            m_previousFloorKI = m_floorPIDTuner.getI();
-            m_previousFloorKD = m_floorPIDTuner.getD();
-            setFloorPID(m_floorPIDTuner.getP(), m_floorPIDTuner.getI(), m_floorPIDTuner.getD());
+        if (m_kickerPIDTuner.isDifferentValues(m_previousFloorKP, m_previousFloorKI, m_previousFloorKD)) {
+            m_previousFloorKP = m_kickerPIDTuner.getP();
+            m_previousFloorKI = m_kickerPIDTuner.getI();
+            m_previousFloorKD = m_kickerPIDTuner.getD();
+            setFloorPID(m_kickerPIDTuner.getP(), m_kickerPIDTuner.getI(), m_kickerPIDTuner.getD());
         }
     }
 }
