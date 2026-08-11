@@ -19,6 +19,10 @@ public class DumpFactory {
         return dump.runFloor(DEFAULT_FLOOR_VOLTAGE);
     }
 
+    public static Command runFloorReverse() {
+        return dump.runFloor(-DEFAULT_FLOOR_VOLTAGE);
+    }
+
     public static Command runBoth() {
         return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setKickerRPM(DEFAULT_KICKER_RPM));
     }

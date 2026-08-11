@@ -157,6 +157,10 @@ public class Dump extends SubsystemBase {
     return m_rollerTargetRPM;
   }
 
+  public double getFloorTargetVoltage() {
+    return m_floorTargetVoltage;
+  }
+
   public Command stopCommand() {
     return run(() -> {
       m_rollerTargetRPM = 0;
@@ -194,5 +198,7 @@ public class Dump extends SubsystemBase {
     m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
 
     m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
+
+    m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
   }
 }

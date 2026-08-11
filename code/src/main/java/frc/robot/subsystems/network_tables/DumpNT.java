@@ -24,11 +24,18 @@ public class DumpNT extends Dump {
 
     private DoubleTopic m_rollerTargetRPMTopic;
     private DoublePublisher m_rollerTargetRPMPublish;
-    private DoubleSubscriber m_rollerTargetRPMSub;
+
+    private DoubleTopic m_rollerActualRPMTopic;
+    private DoublePublisher m_rollerActualRPMPublish;
 
     private DoubleTopic m_kickerTargetRPMTopic;
     private DoublePublisher m_kickerTargetRPMPublish;
-    private DoubleSubscriber m_kickerTargetRPMSub;
+
+    private DoubleTopic m_kickerActualRPMTopic;
+    private DoublePublisher m_kickerActualRPMPublish;
+
+    private DoubleTopic m_floorTargetVoltageTopic;
+    private DoublePublisher m_floorTargetVoltagePublish;
 
     public DumpNT() {
         m_rollerPIDTuner = new PIDTuner("dump/tuning/roller", false);
@@ -44,7 +51,18 @@ public class DumpNT extends Dump {
 
         m_rollerTargetRPMTopic = m_globalNT.getDoubleTopic("dump/roller/targetRPM");
         m_rollerTargetRPMPublish = m_rollerTargetRPMTopic.publish();
-        m_rollerTargetRPMSub = m_rollerTargetRPMTopic.subscribe(0);
+
+        m_kickerTargetRPMTopic = m_globalNT.getDoubleTopic("dump/kicker/targetRPM");
+        m_kickerTargetRPMPublish = m_kickerTargetRPMTopic.publish();
+
+        m_rollerActualRPMTopic = m_globalNT.getDoubleTopic("dump/roller/actualRPM");
+        m_rollerActualRPMPublish = m_rollerActualRPMTopic.publish();
+
+        m_kickerActualRPMTopic = m_globalNT.getDoubleTopic("dump/kicker/actualRPM");
+        m_kickerActualRPMPublish = m_kickerActualRPMTopic.publish();
+
+        m_floorTargetVoltageTopic = m_globalNT.getDoubleTopic("dump/floor/targetVoltage");
+        m_floorTargetVoltagePublish = m_floorTargetVoltageTopic.publish();
 
         m_previousRollerKP = ROLLER_KP;
         m_previousRollerKI = ROLLER_KI;
@@ -59,6 +77,12 @@ public class DumpNT extends Dump {
     public void periodic() {
         super.periodic();
         m_rollerTargetRPMPublish.set(super.getRollerTargetRPM());
+        m_kickerTargetRPMPublish.set(super.getKickerTargetRPM());
+
+        m_rollerActualRPMPublish.set(super.getRollerRPM());
+        m_kickerActualRPMPublish.set(super.getKickerRPM());
+
+        m_floorTargetVoltagePublish.set(super.getFloorTargetVoltage());
 
         if (m_rollerPIDTuner.isDifferentValues(m_previousRollerKP, m_previousRollerKI, m_previousRollerKD)) {
             m_previousRollerKP = m_rollerPIDTuner.getP();
