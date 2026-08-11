@@ -79,20 +79,24 @@ public class Dump extends SubsystemBase {
     m_rightRollerConfig = m_rollerConfig.clone();
     m_rightRollerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+    m_rollerFollowerConfig.CurrentLimits = m_rollerCurrentConfig;
+
     m_kickerConfig.Slot0.kP = KICKER_KP;
     m_kickerConfig.Slot0.kI = KICKER_KI;
     m_kickerConfig.Slot0.kD = KICKER_KD;
     m_kickerConfig.Slot0.kV = KICKER_KV;
     m_kickerConfig.CurrentLimits = m_kickerCurrentConfig;
+
+    m_kickerFollowerConfig.CurrentLimits = m_kickerCurrentConfig;
+
+    m_floorConfig.CurrentLimits = m_floorCurrentConfig;
+
     // TODO: change brake/coast values depending on what we need
     m_rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    m_kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    m_floorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_rollerFollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    m_kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_kickerFollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    m_rollerFollowerConfig.CurrentLimits = m_rollerCurrentConfig;
-    m_kickerFollowerConfig.CurrentLimits = m_kickerCurrentConfig;
+    m_floorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     m_leftRoller.getConfigurator().apply(m_leftRollerConfig);
     m_leftRollerFollow.getConfigurator().apply(m_rollerFollowerConfig);
@@ -101,6 +105,8 @@ public class Dump extends SubsystemBase {
 
     m_kicker.getConfigurator().apply(m_kickerConfig);
     m_kickerFollow.getConfigurator().apply(m_kickerFollowerConfig);
+
+    m_floor.getConfigurator().apply(m_floorConfig);
 
     Follower leftFollowReq = new Follower(LEFT_ROLLER_ID, MotorAlignmentValue.Aligned);
     m_leftRollerFollow.setControl(leftFollowReq);
@@ -111,6 +117,7 @@ public class Dump extends SubsystemBase {
 
     m_rollerVelControl = new VelocityVoltage(0);
     m_kickerVelControl = new VelocityVoltage(0);
+    m_floorVoltageOut = new VoltageOut(0);
   }
 
   public void setRollerPID(double new_P, double new_I, double new_D) {
@@ -124,7 +131,7 @@ public class Dump extends SubsystemBase {
     m_rightRoller.getConfigurator().apply(slot0Config);
   }
 
-  public void setFloorPID(double new_P, double new_I, double new_D) {
+  public void setKickerPID(double new_P, double new_I, double new_D) {
     Slot0Configs slot0Config2 = new Slot0Configs();
     slot0Config2.kP = new_P;
     slot0Config2.kI = new_I;
@@ -138,7 +145,15 @@ public class Dump extends SubsystemBase {
     return m_leftRoller.getVelocity().getValueAsDouble() * 60;
   }
 
-  public double getTargetRPM() {
+  public double getRollerTargetRPM() {
+    return m_rollerTargetRPM;
+  }
+
+  public double getKickerRPM() {
+    return m_kicker.getVelocity().getValueAsDouble() * 60;
+  }
+
+  public double getKickerTargetRPM() {
     return m_rollerTargetRPM;
   }
 
@@ -157,7 +172,7 @@ public class Dump extends SubsystemBase {
     });
   }
 
-  public Command setFloorRPM(double rpm) {
+  public Command setKickerRPM(double rpm) {
     return startEnd(() -> {
       m_kickerTargetRPM = rpm;
     }, () -> {
@@ -165,17 +180,13 @@ public class Dump extends SubsystemBase {
     });
   }
 
-  // public Command setRollerRPM(double rpm) {
-  // return run(() -> {
-  // m_rollerTargetRPM = rpm;
-  // });
-  // }
-
-  // public Command setFloorRPM(double rpm) {
-  // return run(() -> {
-  // m_kickerTargetRPM = rpm;
-  // });
-  // }
+  public Command runFloor(double voltage) {
+    return startEnd(() -> {
+      m_floorTargetVoltage = voltage;
+    }, () -> {
+      m_floorTargetVoltage = 0;
+    });
+  }
 
   @Override
   public void periodic() {

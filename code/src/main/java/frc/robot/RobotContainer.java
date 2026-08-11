@@ -25,7 +25,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_buttonController.a().whileTrue(DumpFactory.runRollers());
-    m_buttonController.b().whileTrue(DumpFactory.runFloor());
+    m_buttonController.b().whileTrue(DumpFactory.runKicker());
   }
 
   private void configureNamedCommands() {

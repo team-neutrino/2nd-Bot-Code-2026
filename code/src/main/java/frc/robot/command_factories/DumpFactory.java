@@ -11,11 +11,15 @@ public class DumpFactory {
         return dump.setRollerRPM(DEFAULT_ROLLER_RPM);
     }
 
+    public static Command runKicker() {
+        return dump.setKickerRPM(DEFAULT_KICKER_RPM);
+    }
+
     public static Command runFloor() {
-        return dump.setFloorRPM(1000);
+        return dump.runFloor(DEFAULT_FLOOR_VOLTAGE);
     }
 
     public static Command runBoth() {
-        return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setFloorRPM(DEFAULT_KICKER_RPM));
+        return dump.setRollerRPM(DEFAULT_ROLLER_RPM).alongWith(dump.setKickerRPM(DEFAULT_KICKER_RPM));
     }
 }
