@@ -58,7 +58,7 @@ public class DumpNT extends Dump {
     @Override
     public void periodic() {
         super.periodic();
-        m_rollerTargetRPMPublish.set(super.getTargetRPM());
+        m_rollerTargetRPMPublish.set(super.getRollerTargetRPM());
 
         if (m_rollerPIDTuner.isDifferentValues(m_previousRollerKP, m_previousRollerKI, m_previousRollerKD)) {
             m_previousRollerKP = m_rollerPIDTuner.getP();
@@ -71,7 +71,7 @@ public class DumpNT extends Dump {
             m_previousFloorKP = m_kickerPIDTuner.getP();
             m_previousFloorKI = m_kickerPIDTuner.getI();
             m_previousFloorKD = m_kickerPIDTuner.getD();
-            setFloorPID(m_kickerPIDTuner.getP(), m_kickerPIDTuner.getI(), m_kickerPIDTuner.getD());
+            setKickerPID(m_kickerPIDTuner.getP(), m_kickerPIDTuner.getI(), m_kickerPIDTuner.getD());
         }
     }
 }
