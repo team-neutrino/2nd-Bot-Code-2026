@@ -56,11 +56,16 @@ public class Constants {
         public static final double LL_HEIGHT_OFFSET = 0.745832;
         public static final double LL_ROLL_OFFSET = 0.0;
         public static final double LL_PITCH_OFFSET = 27.5;
-        public static final double LL_YAW_OFFSET = 0.0; 
+        public static final double LL_YAW_OFFSET = 0.0;
 
-        public static final double LL_MODEL = 4; // change this depending on how good of a limelight design puts on there
+        public static final double LL_MODEL = 4; // change this depending on how good of a limelight design puts on
+                                                 // there
 
+        public static final double MT1_WEIGHT_YAW = .7;
+        public static final double PIGEON_SEED_PERIOD = 1.0;
+        public static final double PIGEON_SEED_XY_THRESHOLD = 0.2;
         public static final double EXTERNAL_WEIGHT = 0.01; // larger number (0-1) = lower trust in internal IMU
+        public static final double PIGEON_SEED_DISTANCE_THRESHOLD = 3.7;
     }
 
     public static class SwerveConstants {
