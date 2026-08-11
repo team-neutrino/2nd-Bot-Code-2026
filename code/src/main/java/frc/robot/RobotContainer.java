@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.command_factories.DumpFactory;
+import frc.robot.subsystems.Dump;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -26,6 +27,7 @@ public class RobotContainer {
   private void configureBindings() {
     m_buttonController.a().whileTrue(DumpFactory.runRollers());
     m_buttonController.b().whileTrue(DumpFactory.runKicker());
+    m_buttonController.y().whileTrue(DumpFactory.runFloor());
   }
 
   private void configureNamedCommands() {
