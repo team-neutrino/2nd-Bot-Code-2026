@@ -82,8 +82,8 @@ public class Intake extends SubsystemBase {
     return m_targetDeployAngle;
   }
 
-  public double getRollerRPM() {
-    return m_rollerMotor.getVelocity().getValueAsDouble() * 60;
+  public double getRollerVoltage() {
+    return m_rollerMotor.getMotorVoltage().getValueAsDouble();
   }
 
   public boolean isAtTarget() {
@@ -102,7 +102,7 @@ public class Intake extends SubsystemBase {
 
   private void checkIsDeployed() {
     if (m_isDeployed) {
-      m_targetDeployAngle = DEPLOYED_POSITION; // 0 should be changed when deploy angle is tested
+      m_targetDeployAngle = DEPLOYED_POSITION;
     } else {
       m_targetDeployAngle = STARTING_POSITION;
     }
@@ -129,15 +129,9 @@ public class Intake extends SubsystemBase {
     });
   }
 
-  public Command deployIntake() {
-    return run(() -> {
-      m_isDeployed = true;
-    });
-  }
-
-  public Command retractIntake() {
-    return run(() -> {
-      m_isDeployed = false;
+  public Command toggleIntake() {
+    return runOnce(() -> {
+      m_isDeployed = !m_isDeployed;
     });
   }
 

@@ -31,7 +31,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+    m_buttonController.leftBumper().whileTrue(IntakeFactory.runIntake());
+    m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
+    m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
   }
 
   private void configureNamedCommands() {

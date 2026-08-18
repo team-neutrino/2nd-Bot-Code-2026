@@ -14,11 +14,11 @@ public class IntakeNT extends Intake {
 
     DoubleTopic currentMotorAngle;
     DoubleTopic targetMotorAngle;
-    DoubleTopic rollerRPM;
+    DoubleTopic rollerVoltage;
 
     final DoublePublisher currentMotorAnglePub;
     final DoublePublisher targetMotorAnglePub;
-    final DoublePublisher rollerRPMPub;
+    final DoublePublisher rollerVoltagePub;
 
     private PIDTuner m_deployPIDTuner;
 
@@ -29,7 +29,7 @@ public class IntakeNT extends Intake {
     public IntakeNT() {
         currentMotorAngle = nt.getDoubleTopic("/intake/current_motor_angle");
         targetMotorAngle = nt.getDoubleTopic("/intake/target_motor_angle");
-        rollerRPM = nt.getDoubleTopic("/intake/roller_rpm");
+        rollerVoltage = nt.getDoubleTopic("/intake/roller_voltage");
 
         currentMotorAnglePub = currentMotorAngle.publish();
         currentMotorAnglePub.setDefault(0.0);
@@ -37,8 +37,8 @@ public class IntakeNT extends Intake {
         targetMotorAnglePub = targetMotorAngle.publish();
         targetMotorAnglePub.setDefault(0.0);
 
-        rollerRPMPub = rollerRPM.publish();
-        rollerRPMPub.setDefault(0.0);
+        rollerVoltagePub = rollerVoltage.publish();
+        rollerVoltagePub.setDefault(0.0);
 
         m_deployPIDTuner = new PIDTuner("intake/{tuning}deployMotor", false);
 
@@ -54,7 +54,7 @@ public class IntakeNT extends Intake {
 
         currentMotorAnglePub.set(getMotorAngle(), now);
         targetMotorAnglePub.set(getTargetAngle(), now);
-        rollerRPMPub.set(getRollerRPM(), now);
+        rollerVoltagePub.set(getRollerVoltage(), now);
 
         if (m_deployPIDTuner.isDifferentValues(m_previousDeployKP,
                 m_previousDeployKI, m_previousDeployKD)) {
