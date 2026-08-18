@@ -18,7 +18,7 @@ import static frc.robot.util.Subsystems.swerve;
 public class Vision extends SubsystemBase {
   private Timer m_timer = new Timer();
 
-  private double m_hubTagCount = 0;
+  private int m_hubTagCount = 0;
   private double m_lastFrame = 0;
 
   private boolean m_enabled = false;
@@ -137,7 +137,6 @@ public class Vision extends SubsystemBase {
 
     if (m_last_update_timestamp > timestamp) {
       m_last_update_timestamp = timestamp;
-      System.out.println("Yay");
     }
   }
 
@@ -161,6 +160,87 @@ public class Vision extends SubsystemBase {
       // MT1_WEIGHT_YAW);
       m_timer.restart();
     }
+  }
+
+  public double getErrorFactor() {
+    double errorFactor = 0.05;
+
+    // some code here if it is relevant
+
+    return errorFactor;
+  }
+
+  private double getMinimumStdDev() {
+    double minStdDev = 0.1;
+
+    // some code here if it is relevant
+
+    return minStdDev;
+  }
+
+  private double getMinimumStdDevTheta() {
+    double minStdDev = 4;
+
+    // some code here if it is relevant
+
+    return minStdDev;
+  }
+
+  /*
+   * This calculates XY standard deviation, which is how confident the vision
+   * system is in its estimate of our position laterally.
+   */
+  private double setXYstdev(double distance, double numberOfTags, int numberOfHubTags) {
+    double minimumXyStdDev = getMinimumStdDev();
+    // if (onBump()) {
+    // return minimumXyStdDev;
+    // }
+
+    double errorFactor = getErrorFactor();
+
+    if (numberOfHubTags < 2) {
+      errorFactor *= 10.0;
+      minimumXyStdDev *= 10.0;
+    }
+
+    return Math.max(
+        minimumXyStdDev,
+        (Math.pow(distance, 2) * errorFactor) / Math.pow(numberOfTags, 2));
+  }
+
+  /** Computes rotational standard deviation using tag distance. */
+  private double setThetastdev(double distance, int numberOfHubTags) {
+    if (!verifyMT1()) {
+      return IGNORE_MEASUREMENT_STD_DEV;
+    }
+    double errorFactor = getErrorFactor();
+    double minimumThetaStDev = getMinimumStdDevTheta();
+    if (numberOfHubTags < 2) {
+      errorFactor *= 10.0;
+      minimumThetaStDev *= 10.0;
+    }
+
+    return Math.max(minimumThetaStDev, (Math.pow(distance, 2) * errorFactor));
+  }
+
+  private double getCalcYawStdev() {
+    if (!verifyMT1()) {
+      return IGNORE_MEASUREMENT_STD_DEV;
+    }
+    double distance = m_estimateMT1.avgTagDist;
+    return setThetastdev(distance, m_hubTagCount);
+  }
+
+  /** Calculates XY measurement standard deviation dynamically. */
+  private double getCalcXYStdev() {
+    if (!verifyMT2()) {
+      return IGNORE_MEASUREMENT_STD_DEV;
+    }
+
+    double numberOfTags = m_estimateMT2.tagCount;
+    double distance = m_estimateMT2.avgTagDist;
+
+    return setXYstdev(distance, numberOfTags, m_hubTagCount);
   }
 
   private void updateHubTagCount(PoseEstimate estimate) {
