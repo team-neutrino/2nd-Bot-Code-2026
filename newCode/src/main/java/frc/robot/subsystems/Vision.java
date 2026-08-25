@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -137,6 +138,8 @@ public class Vision extends SubsystemBase {
 
     if (m_last_update_timestamp > timestamp) {
       m_last_update_timestamp = timestamp;
+      swerve.addVisionMeasurement(pose, timestamp,
+          VecBuilder.fill(getCalcXYStdev(), getCalcXYStdev(), getCalcYawStdev()));
     }
   }
 
@@ -146,9 +149,9 @@ public class Vision extends SubsystemBase {
     return m_estimateMT1 != null // don't crash
         && ((m_estimateMT1.tagCount > 1) || (m_estimateMT1.tagCount == 1 && !m_enabled)) // only if mt1 sees more than
                                                                                          // one tag or IDK
-        // && Math.abs(swerve.getState().Speeds.omegaRadiansPerSecond) < Math.PI / 4
+        && Math.abs(swerve.getState().Speeds.omegaRadiansPerSecond) < Math.PI / 4
         && poseInField(m_estimateMT1) // idk
-        // && swerve.getSpeedMetersPerSecond() < PIGEON_SEED_XY_THRESHOLD
+        && swerve.getSpeedMetersPerSecond() < PIGEON_SEED_XY_THRESHOLD
         && m_timer.hasElapsed(PIGEON_SEED_PERIOD) // don't reset pigeon too often
         && m_estimateMT1.avgTagDist < PIGEON_SEED_DISTANCE_THRESHOLD; // only reset pigeon if the tags are far enough
                                                                       // apart to give good data
@@ -156,8 +159,8 @@ public class Vision extends SubsystemBase {
 
   public void updatePigeonSeed() {
     if (verifyPigeonSeedUpdate() && !m_currentPose.equals(m_lastPose)) {
-      // swerve.seedYawMT1(m_estimateMT1.pose.getRotation().getDegrees(),
-      // MT1_WEIGHT_YAW);
+      swerve.seedYawMT1(m_estimateMT1.pose.getRotation().getDegrees(),
+          MT1_WEIGHT_YAW);
       m_timer.restart();
     }
   }
@@ -312,14 +315,14 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    // final double yaw_degrees = swerve.getYawDegrees();
-    // final double pitch_degrees = swerve.getPitch();
-    // final double roll_degrees = swerve.getRoll();
-    // final double yaw_rate = swerve.getYawRate();
-    // final double pitch_rate = swerve.getPitchRate();
-    // final double roll_rate = swerve.getRollRate();
-    // setRobotOrientation(yaw_degrees, yaw_rate, pitch_degrees, pitch_rate,
-    // roll_degrees, roll_rate);
+    final double yaw_degrees = swerve.getYawDegrees();
+    final double pitch_degrees = swerve.getPitch();
+    final double roll_degrees = swerve.getRoll();
+    final double yaw_rate = swerve.getYawRate();
+    final double pitch_rate = swerve.getPitchRate();
+    final double roll_rate = swerve.getRollRate();
+    setRobotOrientation(yaw_degrees, yaw_rate, pitch_degrees, pitch_rate,
+        roll_degrees, roll_rate);
 
     m_enabled = DriverStation.isEnabled();
 
