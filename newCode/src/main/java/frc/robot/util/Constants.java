@@ -21,7 +21,23 @@ public class Constants {
     }
 
     public static class IntakeConstants {
+        public static final int DEPLOY_MOTOR_ID = 31;
+        public static final int ROLLER_MOTOR_ID = 32;
+        public static final int ROLLER_FOLLOWER_ID = 33;
 
+        public static final double DEPLOY_CURRENT_LIMIT = 40.0; // Needs to be tested
+        public static final double ROLLER_CURRENT_LIMIT = 40.0; // Needs to be tested
+
+        public static final double INTAKE_VOLTAGE = 7.5; // Needs to be tested
+        public static final double OUTTAKE_VOLTAGE = -7.5; // Needs to be tested
+
+        public static final double STARTING_POSITION = 0.0;
+        public static final double DEPLOYED_POSITION = 5.0; // Needs to be tested
+        public static final double ALLOWED_TARGET_ERROR = 0.25; // Needs to be tested
+
+        public static final double INTAKE_kP = 0.25; // Needs to be tested
+        public static final double INTAKE_kI = 0.0;
+        public static final double INTAKE_kD = 0.0;
     }
 
     public static class LimelightConstants {
