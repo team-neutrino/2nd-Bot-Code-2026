@@ -5,6 +5,7 @@
 package frc.robot.util;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -14,6 +15,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class Constants {
     public static class RioConstants {
         public static final CANBus RIO_BUS = new CANBus("rio");
+    }
+
+    public static class GlobalConstants {
+        public static Optional<Boolean> RED_ALLIANCE = Optional.empty();
     }
 
     public static class DumpConstants {
@@ -52,6 +57,27 @@ public class Constants {
         public static final double INTAKE_kD = 0.0;
     }
 
+    public static class SwerveConstants {
+        public static final double BEACH_DEBOUNCE_TIME = 0.3;
+        public static final double SLEW_LIMIT = 4.0;
+        public static final double GYRO_SCALAR_Z = -5.3;
+        public static final double MAX_SPEED = 5.7;
+        public static final double MAX_ROTATION_SPEED = 6.0; // 1.5 * Math.PI
+        public static final double SLOW_MAX_ROTATION_SPEED = 4.0;
+        public static final double SLOW_MAX_SPEED = 2.0;
+        public static final double SLOWEST_MAX_ROTATION_SPEED = 2.0;
+        public static final double SLOWEST_MAX_SPEED = 0.75;
+        public static final double ROTATIONAL_P = 6.0;
+        public static final double AUTO_ALIGN_D = 0.0;
+        public static final double JOYSTICK_REST_ALLOWED_ERROR = 0.1;
+        public static final double CONVERGENCE_ITERATIONS = 3.0;
+        public static final double SHOOT_WHILE_MOVING_THRESHOLD = 2.5;
+        public static final double ROBOT_WHEEL_OFFSET = 0.276225;
+        public static final double BRAKE_ALLOWED_ERROR = 0.05;
+        public static final double START_BRAKING_VELOCITY = 0.1;
+        public static final double BEACHED_ANGLE = 3.0;
+    }
+
     public static class LimelightConstants {
         public static final String LL = "limelight";
 
@@ -72,10 +98,6 @@ public class Constants {
         public static final double PIGEON_SEED_DISTANCE_THRESHOLD = 3.7;
         public static final double ERROR_FACTOR = 2000;
         public static final double IGNORE_MEASUREMENT_STD_DEV = 999999999;
-    }
-
-    public static class SwerveConstants {
-
     }
 
     public static class FieldMeasurementConstants {
