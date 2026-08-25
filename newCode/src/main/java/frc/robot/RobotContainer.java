@@ -39,6 +39,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
+        setDefaultCommands();
     }
 
     private void configureBindings() {
@@ -76,6 +77,10 @@ public class RobotContainer {
         m_driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    public void setDefaultCommands(){
+
     }
 
     public Command getAutonomousCommand() {
