@@ -22,12 +22,6 @@ public class DumpNT extends Dump {
     private double m_previousFloorKI;
     private double m_previousFloorKD;
 
-    private DoubleTopic m_rollerTargetRPMTopic;
-    private DoublePublisher m_rollerTargetRPMPublish;
-
-    private DoubleTopic m_rollerActualRPMTopic;
-    private DoublePublisher m_rollerActualRPMPublish;
-
     private DoubleTopic m_kickerTargetRPMTopic;
     private DoublePublisher m_kickerTargetRPMPublish;
 
@@ -49,14 +43,8 @@ public class DumpNT extends Dump {
         m_kickerPIDTuner.setI(KICKER_KI);
         m_kickerPIDTuner.setD(KICKER_KD);
 
-        m_rollerTargetRPMTopic = m_globalNT.getDoubleTopic("dump/roller/targetRPM");
-        m_rollerTargetRPMPublish = m_rollerTargetRPMTopic.publish();
-
         m_kickerTargetRPMTopic = m_globalNT.getDoubleTopic("dump/kicker/targetRPM");
         m_kickerTargetRPMPublish = m_kickerTargetRPMTopic.publish();
-
-        m_rollerActualRPMTopic = m_globalNT.getDoubleTopic("dump/roller/actualRPM");
-        m_rollerActualRPMPublish = m_rollerActualRPMTopic.publish();
 
         m_kickerActualRPMTopic = m_globalNT.getDoubleTopic("dump/kicker/actualRPM");
         m_kickerActualRPMPublish = m_kickerActualRPMTopic.publish();
@@ -76,11 +64,8 @@ public class DumpNT extends Dump {
     @Override
     public void periodic() {
         super.periodic();
-        m_rollerTargetRPMPublish.set(super.getRollerTargetRPM());
-        m_kickerTargetRPMPublish.set(super.getKickerTargetRPM());
-
-        m_rollerActualRPMPublish.set(super.getRollerRPM());
         m_kickerActualRPMPublish.set(super.getKickerRPM());
+        m_kickerTargetRPMPublish.set(super.getKickerTargetRPM());
 
         m_floorTargetVoltagePublish.set(super.getFloorTargetVoltage());
 
