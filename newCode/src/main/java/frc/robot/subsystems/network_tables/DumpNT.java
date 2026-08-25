@@ -32,12 +32,7 @@ public class DumpNT extends Dump {
     private DoublePublisher m_floorTargetVoltagePublish;
 
     public DumpNT() {
-        m_rollerPIDTuner = new PIDTuner("dump/tuning/roller", false);
         m_kickerPIDTuner = new PIDTuner("dump/tuning/floor", false);
-
-        m_rollerPIDTuner.setP(ROLLER_KP);
-        m_rollerPIDTuner.setI(ROLLER_KI);
-        m_rollerPIDTuner.setD(ROLLER_KD);
 
         m_kickerPIDTuner.setP(KICKER_KP);
         m_kickerPIDTuner.setI(KICKER_KI);
@@ -52,10 +47,6 @@ public class DumpNT extends Dump {
         m_floorTargetVoltageTopic = m_globalNT.getDoubleTopic("dump/floor/targetVoltage");
         m_floorTargetVoltagePublish = m_floorTargetVoltageTopic.publish();
 
-        m_previousRollerKP = ROLLER_KP;
-        m_previousRollerKI = ROLLER_KI;
-        m_previousRollerKD = ROLLER_KD;
-
         m_previousFloorKP = KICKER_KP;
         m_previousFloorKI = KICKER_KI;
         m_previousFloorKD = KICKER_KD;
@@ -68,13 +59,6 @@ public class DumpNT extends Dump {
         m_kickerTargetRPMPublish.set(super.getKickerTargetRPM());
 
         m_floorTargetVoltagePublish.set(super.getFloorTargetVoltage());
-
-        if (m_rollerPIDTuner.isDifferentValues(m_previousRollerKP, m_previousRollerKI, m_previousRollerKD)) {
-            m_previousRollerKP = m_rollerPIDTuner.getP();
-            m_previousRollerKI = m_rollerPIDTuner.getI();
-            m_previousRollerKD = m_rollerPIDTuner.getD();
-            setRollerPID(m_rollerPIDTuner.getP(), m_rollerPIDTuner.getI(), m_rollerPIDTuner.getD());
-        }
 
         if (m_kickerPIDTuner.isDifferentValues(m_previousFloorKP, m_previousFloorKI, m_previousFloorKD)) {
             m_previousFloorKP = m_kickerPIDTuner.getP();

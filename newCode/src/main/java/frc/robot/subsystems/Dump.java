@@ -64,20 +64,12 @@ public class Dump extends SubsystemBase {
     m_floorVoltageOut = new VoltageOut(0);
   }
 
-  public void setRollerPID(double new_P, double new_I, double new_D) {
-    Slot0Configs slot0Config = new Slot0Configs();
-    slot0Config.kP = new_P;
-    slot0Config.kI = new_I;
-    slot0Config.kD = new_D;
-    slot0Config.kV = ROLLER_KV;
-  }
-
   public void setKickerPID(double new_P, double new_I, double new_D) {
     Slot0Configs slot0Config2 = new Slot0Configs();
     slot0Config2.kP = new_P;
     slot0Config2.kI = new_I;
     slot0Config2.kD = new_D;
-    slot0Config2.kV = ROLLER_KV;
+    slot0Config2.kV = KICKER_KV;
 
     m_kicker.getConfigurator().apply(slot0Config2);
   }
