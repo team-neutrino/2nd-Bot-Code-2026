@@ -35,6 +35,7 @@ public class Dump extends SubsystemBase {
 
   public Dump() {
     m_kickerCurrentConfig = new CurrentLimitsConfigs();
+    m_floorCurrentConfig = new CurrentLimitsConfigs();
 
     m_kicker = new TalonFX(KICKER_ID, RIO_BUS);
     m_floor = new TalonFX(FLOOR_ID, RIO_BUS);
@@ -86,9 +87,15 @@ public class Dump extends SubsystemBase {
     return m_floorTargetVoltage;
   }
 
-  public Command stopCommand() {
+  public Command stopKickerCommand() {
     return run(() -> {
       m_kickerTargetRPM = 0;
+    });
+  }
+
+   public Command stopFloorCommand() {
+    return run(() -> {
+      m_floorTargetVoltage = 0;
     });
   }
 
@@ -106,6 +113,17 @@ public class Dump extends SubsystemBase {
     }, () -> {
       m_floorTargetVoltage = 0;
     });
+  }
+
+  public Command runBoth(double rpm, double voltage){
+    return startEnd(() -> {
+      m_kickerTargetRPM = rpm;
+      m_floorTargetVoltage = voltage;
+    }, () -> {
+       m_kickerTargetRPM = 0;
+      m_floorTargetVoltage = 0;
+    });
+
   }
 
   @Override

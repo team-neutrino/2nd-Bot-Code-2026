@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -90,9 +91,7 @@ public class RobotContainer {
         m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
         m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
 
-        m_buttonController.x().whileTrue(DumpFactory.runKicker());
-        m_buttonController.y().whileTrue(DumpFactory.runFloor());
-        m_buttonController.a().whileTrue(DumpFactory.runBoth());
+        m_buttonController.x().whileTrue(DumpFactory.runKicker()); // aka "shoot"
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

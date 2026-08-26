@@ -19,6 +19,6 @@ public class DumpFactory {
     }
 
     public static Command runBoth(){
-        return dump.runFloor(DEFAULT_FLOOR_VOLTAGE).alongWith(dump.setKickerRPM(DEFAULT_KICKER_RPM));
+       return dump.runBoth(DEFAULT_KICKER_RPM, DEFAULT_FLOOR_VOLTAGE);
     }
 }
