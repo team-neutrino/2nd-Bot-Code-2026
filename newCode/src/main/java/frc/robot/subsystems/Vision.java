@@ -3,7 +3,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.StructTopic;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,6 +32,15 @@ public class Vision extends SubsystemBase {
   private PoseEstimate m_estimateMT1;
   private PoseEstimate m_estimateMT2;
 
+  private boolean m_poseZeroWasPublished = false;
+  private boolean m_yawZeroWasPublished = false;
+  private NetworkTableInstance m_nt = NetworkTableInstance.getDefault();
+  private StructTopic<Pose2d> m_pose;
+  private StructPublisher<Pose2d> m_posePub;
+  private Pose2d blank = new Pose2d();
+  private DoubleTopic m_yaw;
+  private DoublePublisher m_yawPub;
+
   private Pose2d m_currentPose = new Pose2d();
   private Pose2d m_lastPose = new Pose2d();
 
@@ -38,6 +52,14 @@ public class Vision extends SubsystemBase {
 
   public Vision() {
     m_timer.start();
+
+    m_pose = m_nt.getStructTopic("/limelight_poses/" + LL, Pose2d.struct);
+    m_yaw = m_nt.getDoubleTopic("/limelight_poses/yaw/" + LL + "Yaw");
+
+    m_posePub = m_pose.publish();
+    m_posePub.setDefault(blank);
+
+    m_yawPub = m_yaw.publish(PubSubOption.keepDuplicates(false));
 
     LimelightHelpers.setLEDMode_ForceOff("limelight"); // no more blinding me
     LimelightHelpers.setCameraPose_RobotSpace(LL,
@@ -162,6 +184,54 @@ public class Vision extends SubsystemBase {
       swerve.seedYawMT1(m_estimateMT1.pose.getRotation().getDegrees(),
           MT1_WEIGHT_YAW);
       m_timer.restart();
+    }
+  }
+
+  public double getEstimateYawMT1() {
+    if (m_estimateMT1 == null) {
+      return IGNORE_MEASUREMENT_STD_DEV;
+    }
+    return m_estimateMT1.pose.getRotation().getDegrees();
+  }
+
+  public Pose2d getEstimatePose() {
+    if (m_estimateMT2 == null) {
+      return Pose2d.kZero;
+    }
+    return m_estimateMT2.pose;
+  }
+
+  public void publishPose() {
+    if (!m_poseZeroWasPublished && getEstimatePose().equals(Pose2d.kZero)) {
+      m_posePub.set(getEstimatePose());
+      m_poseZeroWasPublished = true;
+    } else if (!getEstimatePose().equals(Pose2d.kZero)) {
+      m_posePub.set(getEstimatePose());
+      m_poseZeroWasPublished = false;
+    }
+  }
+
+  public void publishYaw() {
+    if (!m_yawZeroWasPublished && getEstimateYawMT1() == IGNORE_MEASUREMENT_STD_DEV) {
+      m_yawPub.set(getEstimateYawMT1());
+      m_yawZeroWasPublished = true;
+    } else if (getEstimateYawMT1() != IGNORE_MEASUREMENT_STD_DEV) {
+      m_yawPub.set(getEstimateYawMT1());
+      m_yawZeroWasPublished = false;
+    }
+  }
+
+  public void publishDefaultPose() {
+    if (!m_poseZeroWasPublished) {
+      m_posePub.set(Pose2d.kZero);
+      m_poseZeroWasPublished = true;
+    }
+  }
+
+  public void publishDefaultYaw() {
+    if (!m_yawZeroWasPublished) {
+      m_yawPub.set(IGNORE_MEASUREMENT_STD_DEV);
+      m_yawZeroWasPublished = true;
     }
   }
 
