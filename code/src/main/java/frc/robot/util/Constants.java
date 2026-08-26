@@ -17,13 +17,31 @@ public class Constants {
     }
 
     public static class DumpConstants {
-        public static final int LEFT_ROLLER_ID = 1;
-        public static final int LEFT_FOLLOWER_ROLLER_ID = 2;
-        public static final int RIGHT_ROLLER_ID = 3;
-        public static final int RIGHT_FOLLOWER_ROLLER_ID = 4;
-        public static final int FLOOR_ID = 5;
-        public static final int FLOOR_FOLLOWER_ID = 6;
+        public static final int LEFT_ROLLER_ID = 21;
+        public static final int LEFT_ROLLER_FOLLOWER_ID = 22;
+        public static final int RIGHT_ROLLER_ID = 23;
+        public static final int RIGHT_ROLLER_FOLLOWER_ID = 24;
+        public static final int KICKER_ID = 25;
+        public static final int KICKER_FOLLOWER_ID = 26;
+        public static final int FLOOR_ID = 27;
 
+        public static final int ROLLER_CURRENT_LIMIT = 40;
+        public static final int KICKER_CURRENT_LIMIT = 40;
+        public static final int FLOOR_CURRENT_LIMIT = 30;
+
+        public static final double ROLLER_KP = .1;
+        public static final double ROLLER_KI = 0;
+        public static final double ROLLER_KD = 0;
+        public static final double ROLLER_KV = .1;
+
+        public static final double KICKER_KP = .1;
+        public static final double KICKER_KI = 0;
+        public static final double KICKER_KD = 0;
+        public static final double KICKER_KV = .1;
+
+        public static final double DEFAULT_ROLLER_RPM = 1000;
+        public static final double DEFAULT_KICKER_RPM = 1000;
+        public static final double DEFAULT_FLOOR_VOLTAGE = 2;
     }
 
     public static class IntakeConstants {

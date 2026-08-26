@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.command_factories.DumpFactory;
 import frc.robot.command_factories.IntakeFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -88,6 +90,8 @@ public class RobotContainer {
         m_buttonController.leftBumper().whileTrue(IntakeFactory.runIntake());
         m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
         m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
+
+        m_buttonController.x().whileTrue(DumpFactory.runKicker()); // aka "shoot"
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

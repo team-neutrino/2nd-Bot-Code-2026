@@ -4,30 +4,30 @@
 
 package frc.robot;
 
-import frc.robot.util.Subsystems;
+import frc.robot.command_factories.DumpFactory;
+import frc.robot.subsystems.Dump;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import static frc.robot.util.Subsystems.*;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_buttonController = new CommandXboxController(1);
 
-  private Subsystems m_subsystemContainer;
-
   public RobotContainer() {
-    m_subsystemContainer = new Subsystems();
     configureDefaultCommands();
     configureBindings();
     configureNamedCommands();
   }
 
   private void configureDefaultCommands() {
-
   }
 
   private void configureBindings() {
-
+    m_buttonController.a().whileTrue(DumpFactory.runRollers());
+    m_buttonController.b().whileTrue(DumpFactory.runKicker());
+    m_buttonController.y().whileTrue(DumpFactory.runFloor());
   }
 
   private void configureNamedCommands() {

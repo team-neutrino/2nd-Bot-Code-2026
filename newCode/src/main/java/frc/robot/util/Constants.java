@@ -17,7 +17,19 @@ public class Constants {
     }
 
     public static class DumpConstants {
-        
+        public static final int KICKER_ID = 21;
+        public static final int FLOOR_ID = 22;
+
+        public static final int KICKER_CURRENT_LIMIT = 40;
+        public static final int FLOOR_CURRENT_LIMIT = 30;
+
+        public static final double KICKER_KP = .1;
+        public static final double KICKER_KI = 0;
+        public static final double KICKER_KD = 0;
+        public static final double KICKER_KV = .1;
+
+        public static final double DEFAULT_KICKER_RPM = 1000;
+        public static final double DEFAULT_FLOOR_VOLTAGE = 2;
     }
 
     public static class IntakeConstants {
