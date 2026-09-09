@@ -9,6 +9,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.StructTopic;
+import edu.wpi.first.networktables.BooleanArrayPublisher;
+import edu.wpi.first.networktables.BooleanArrayTopic;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,6 +43,10 @@ public class Vision extends SubsystemBase {
   private DoubleTopic m_yaw;
   private DoublePublisher m_yawPub;
 
+  private BooleanArrayPublisher m_mt2ConditionsPub;
+  private BooleanArrayTopic m_mt2ConditionsTopic;
+  private boolean[] m_mt2Conditions;
+
   private Pose2d m_currentPose = new Pose2d();
   private Pose2d m_lastPose = new Pose2d();
 
@@ -55,6 +61,11 @@ public class Vision extends SubsystemBase {
 
     m_pose = m_nt.getStructTopic("/limelight_poses/" + LL, Pose2d.struct);
     m_yaw = m_nt.getDoubleTopic("/limelight_poses/yaw/" + LL + "Yaw");
+
+    m_mt2Conditions = new boolean[5];
+
+    m_mt2ConditionsTopic = m_nt.getBooleanArrayTopic("/limelight_mt2_conditions/" + LL);
+    m_mt2ConditionsPub = m_mt2ConditionsTopic.publish();
 
     m_posePub = m_pose.publish();
     m_posePub.setDefault(blank);
@@ -96,6 +107,18 @@ public class Vision extends SubsystemBase {
 
   // makes sure megatag 2 pose is Real....
   private boolean verifyMT2() {
+    // System.out.println("NULL CHECK: " + m_estimateMT2 != null);
+    // System.out.println("TAG COUNT CHECK: " + (m_estimateMT2.tagCount));
+    // System.out.println("IS MEGA TAG 2: " + m_estimateMT2.isMegaTag2);
+    // System.out.println("AVG TAG DIST IS NOT NAN: " +
+    //     !Double.isNaN(m_estimateMT2.avgTagDist));
+    // System.out.println("POSE IN FIELD CHECK: " + poseInField(m_estimateMT2));
+    // System.out.println("THIS LINE PRINTS RIGHT BEFORE THE COORDINATE ONE");
+    // System.out.println("X: " + m_estimateMT2.pose.getX() + " Y: " +
+    //     m_estimateMT2.pose.getY());
+
+    m_mt2ConditionsPub.set(new boolean[]{m_estimateMT2 != null, m_estimateMT2.tagCount != 0, m_estimateMT2.isMegaTag2, !Double.isNaN(m_estimateMT2.avgTagDist), poseInField(m_estimateMT2)});
+
     return m_estimateMT2 != null
         && m_estimateMT2.tagCount != 0
         && m_estimateMT2.isMegaTag2 // I would sure hope so
@@ -127,10 +150,12 @@ public class Vision extends SubsystemBase {
   private void updateFusionMT() {
     final double frame = getFrame();
 
-    if (frame <= m_lastFrame || frame < 0.0) { // don't use any frames from the past or that we've alr used
-      m_hubTagCount = 0;
-      return;
-    }
+    // if (frame <= m_lastFrame || frame < 0.0) { // don't use any frames from the
+    // m_hubTagCount = 0;
+    // return;
+    // }
+
+    m_lastFrame = frame;
 
     m_estimateMT1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(LL);
     m_estimateMT2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LL);
@@ -139,6 +164,7 @@ public class Vision extends SubsystemBase {
     Pose2d pose;
 
     if (!verifyMT2()) { // any view with an invalid MT2 pose is useless for this algorithm
+      System.out.println("======== MT2 INVALID ==============");
       return;
     }
 
@@ -189,6 +215,8 @@ public class Vision extends SubsystemBase {
 
   public double getEstimateYawMT1() {
     if (m_estimateMT1 == null) {
+      // System.out.println("=======RETURNING 1e9 BECAUSE ESTIMATE FOR MT1 IS
+      // NULL=========");
       return IGNORE_MEASUREMENT_STD_DEV;
     }
     return m_estimateMT1.pose.getRotation().getDegrees();
@@ -196,6 +224,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getEstimatePose() {
     if (m_estimateMT2 == null) {
+      // System.out.println("=========MT2 ESTIMATE IS NULL============");
       return Pose2d.kZero;
     }
     return m_estimateMT2.pose;
@@ -337,6 +366,7 @@ public class Vision extends SubsystemBase {
   /** Supplies robot orientation to the Limelight for IMU fusion. */
   public void setRobotOrientation(double yawDeg, double yawRate, double pitchDeg,
       double pitchRate, double rollDeg, double rollRate) {
+    System.out.println(LL + yawDeg + yawRate + pitchDeg + pitchRate + rollDeg + rollRate);
     LimelightHelpers.SetRobotOrientation(LL, yawDeg, yawRate, pitchDeg, pitchRate, rollDeg, rollRate);
 
   }
@@ -381,27 +411,32 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    System.out.println("periodic");
     if (swerve == null) {
+
       return;
     }
 
-    final double yaw_degrees = swerve.getYawDegrees();
+    final double yaw_degrees = 50;
     final double pitch_degrees = swerve.getPitch();
     final double roll_degrees = swerve.getRoll();
     final double yaw_rate = swerve.getYawRate();
     final double pitch_rate = swerve.getPitchRate();
     final double roll_rate = swerve.getRollRate();
+
     setRobotOrientation(yaw_degrees, yaw_rate, pitch_degrees, pitch_rate,
         roll_degrees, roll_rate);
 
     m_enabled = DriverStation.isEnabled();
 
-    setIMUMode();
-    triggerCaptureRewind();
+    // setIMUMode();
+    // triggerCaptureRewind();
 
     updateFusionMT();
     updatePigeonSeed();
     updateHubTagCount(m_estimateMT2);
+    publishPose();
+    publishYaw();
     m_lastPose = m_currentPose;
   }
 }

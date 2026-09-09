@@ -79,7 +79,7 @@ public class Constants {
     }
 
     public static class LimelightConstants {
-        public static final String LL = "limelight";
+        public static final String LL = "limelight-ll";
 
         public static final double LL_FORWARD_OFFSET = 0.070646; // not real values
         public static final double LL_SIDE_OFFSET = -0.000635;
@@ -88,7 +88,7 @@ public class Constants {
         public static final double LL_PITCH_OFFSET = 27.5;
         public static final double LL_YAW_OFFSET = 0.0;
 
-        public static final double LL_MODEL = 4; // change this depending on how good of a limelight design puts on
+        public static final double LL_MODEL = 3; // change this depending on how good of a limelight design puts on
                                                  // there
 
         public static final double MT1_WEIGHT_YAW = .7;

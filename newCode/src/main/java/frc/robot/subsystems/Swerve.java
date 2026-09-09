@@ -124,7 +124,7 @@ public class Swerve extends CommandSwerveDrivetrain {
     return run(() -> {
       resetRotation(new Rotation2d(0));
       getPigeon2().reset();
-      System.out.println("Yaw reset to 0");
+      // System.out.println("Yaw reset to 0");
       // need more research on the following
       // seedFieldCentric();
     });
