@@ -98,6 +98,7 @@ public class Constants {
         public static final double PIGEON_SEED_DISTANCE_THRESHOLD = 3.7;
         public static final double ERROR_FACTOR = 2000;
         public static final double IGNORE_MEASUREMENT_STD_DEV = 999999999;
+        public static final Pose2d INVALID_MT2_POSITION = new Pose2d(8.2705, 4.0345, new Rotation2d(0));
     }
 
     public static class FieldMeasurementConstants {

@@ -111,19 +111,21 @@ public class Vision extends SubsystemBase {
     // System.out.println("TAG COUNT CHECK: " + (m_estimateMT2.tagCount));
     // System.out.println("IS MEGA TAG 2: " + m_estimateMT2.isMegaTag2);
     // System.out.println("AVG TAG DIST IS NOT NAN: " +
-    //     !Double.isNaN(m_estimateMT2.avgTagDist));
+    // !Double.isNaN(m_estimateMT2.avgTagDist));
     // System.out.println("POSE IN FIELD CHECK: " + poseInField(m_estimateMT2));
     // System.out.println("THIS LINE PRINTS RIGHT BEFORE THE COORDINATE ONE");
     // System.out.println("X: " + m_estimateMT2.pose.getX() + " Y: " +
-    //     m_estimateMT2.pose.getY());
+    // m_estimateMT2.pose.getY());
 
-    m_mt2ConditionsPub.set(new boolean[]{m_estimateMT2 != null, m_estimateMT2.tagCount != 0, m_estimateMT2.isMegaTag2, !Double.isNaN(m_estimateMT2.avgTagDist), poseInField(m_estimateMT2)});
+    m_mt2ConditionsPub.set(new boolean[] { m_estimateMT2 != null, m_estimateMT2.tagCount != 0, m_estimateMT2.isMegaTag2,
+        !Double.isNaN(m_estimateMT2.avgTagDist), poseInField(m_estimateMT2) });
 
     return m_estimateMT2 != null
         && m_estimateMT2.tagCount != 0
         && m_estimateMT2.isMegaTag2 // I would sure hope so
         && !Double.isNaN(m_estimateMT2.avgTagDist)
-        && poseInField(m_estimateMT2);
+        && poseInField(m_estimateMT2)
+        && !m_estimateMT2.pose.equals(INVALID_MT2_POSITION);
   }
 
   /*
@@ -164,7 +166,7 @@ public class Vision extends SubsystemBase {
     Pose2d pose;
 
     if (!verifyMT2()) { // any view with an invalid MT2 pose is useless for this algorithm
-      System.out.println("======== MT2 INVALID ==============");
+      // System.out.println("======== MT2 INVALID ==============");
       return;
     }
 
@@ -184,7 +186,7 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    if (m_last_update_timestamp > timestamp) {
+    if (m_last_update_timestamp < timestamp) {
       m_last_update_timestamp = timestamp;
       swerve.addVisionMeasurement(pose, timestamp,
           VecBuilder.fill(getCalcXYStdev(), getCalcXYStdev(), getCalcYawStdev()));
@@ -366,7 +368,6 @@ public class Vision extends SubsystemBase {
   /** Supplies robot orientation to the Limelight for IMU fusion. */
   public void setRobotOrientation(double yawDeg, double yawRate, double pitchDeg,
       double pitchRate, double rollDeg, double rollRate) {
-    System.out.println(LL + yawDeg + yawRate + pitchDeg + pitchRate + rollDeg + rollRate);
     LimelightHelpers.SetRobotOrientation(LL, yawDeg, yawRate, pitchDeg, pitchRate, rollDeg, rollRate);
 
   }
@@ -411,18 +412,24 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    System.out.println("periodic");
     if (swerve == null) {
 
       return;
     }
 
-    final double yaw_degrees = 50;
+    final double yaw_degrees = swerve.getYaw360();
     final double pitch_degrees = swerve.getPitch();
     final double roll_degrees = swerve.getRoll();
     final double yaw_rate = swerve.getYawRate();
     final double pitch_rate = swerve.getPitchRate();
     final double roll_rate = swerve.getRollRate();
+
+    // final double yaw_degrees = 30;
+    // final double pitch_degrees = 30;
+    // final double roll_degrees = 30;
+    // final double yaw_rate = 30;
+    // final double pitch_rate = 30;
+    // final double roll_rate = 30;
 
     setRobotOrientation(yaw_degrees, yaw_rate, pitch_degrees, pitch_rate,
         roll_degrees, roll_rate);
@@ -437,6 +444,7 @@ public class Vision extends SubsystemBase {
     updateHubTagCount(m_estimateMT2);
     publishPose();
     publishYaw();
+
     m_lastPose = m_currentPose;
   }
 }
