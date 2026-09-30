@@ -24,9 +24,6 @@ import static frc.robot.util.Subsystems.*;
 public class RobotContainer {
     private Subsystems m_subsystemContainer;
 
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
     private final CommandXboxController m_driverController = new CommandXboxController(0);
     private final CommandXboxController m_buttonController = new CommandXboxController(1);
 
