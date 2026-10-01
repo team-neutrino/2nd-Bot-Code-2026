@@ -192,6 +192,17 @@ public class Dump extends SubsystemBase {
     });
   }
 
+  public Command runBoth(double rpm, double voltage) {
+    return startEnd(() -> {
+      m_kickerTargetRPM = rpm;
+      m_floorTargetVoltage = voltage;
+    }, () -> {
+      m_kickerTargetRPM = 0;
+      m_floorTargetVoltage = 0;
+    });
+
+  }
+
   @Override
   public void periodic() {
     m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
