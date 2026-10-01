@@ -192,12 +192,14 @@ public class Dump extends SubsystemBase {
     });
   }
 
-  public Command runBoth(double rpm, double voltage) {
+  public Command runAll(double kickerRpm, double rollerRpm, double voltage) {
     return startEnd(() -> {
-      m_kickerTargetRPM = rpm;
+      m_kickerTargetRPM = kickerRpm;
+      m_rollerTargetRPM = rollerRpm;
       m_floorTargetVoltage = voltage;
     }, () -> {
       m_kickerTargetRPM = 0;
+      m_rollerTargetRPM = 0;
       m_floorTargetVoltage = 0;
     });
 
