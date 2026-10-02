@@ -43,7 +43,7 @@ public class RobotContainer {
         m_buttonController.leftBumper().whileTrue(IntakeFactory.runIntake());
         m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
         m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
-        m_buttonController.x().whileTrue(DumpFactory.runKicker()); // aka "shoot"
+        m_buttonController.x().whileTrue(DumpFactory.runAll()); // aka "shoot"
     }
 
     public void setDefaultCommands(){
