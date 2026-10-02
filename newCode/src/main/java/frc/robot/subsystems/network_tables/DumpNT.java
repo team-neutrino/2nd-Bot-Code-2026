@@ -27,6 +27,9 @@ public class DumpNT extends Dump {
     private DoubleTopic m_rollerActualRPMTopic;
     private DoublePublisher m_rollerActualRPMPublish;
 
+    private DoubleTopic m_kickerCurrentTopic;
+    private DoublePublisher m_kickerCurrentPublish;
+
     private DoubleTopic m_kickerTargetRPMTopic;
     private DoublePublisher m_kickerTargetRPMPublish;
 
@@ -57,6 +60,9 @@ public class DumpNT extends Dump {
         m_rollerActualRPMTopic = m_globalNT.getDoubleTopic("dump/roller/actualRPM");
         m_rollerActualRPMPublish = m_rollerActualRPMTopic.publish();
 
+        m_kickerCurrentTopic = m_globalNT.getDoubleTopic("dump/kicker/current");
+        m_kickerCurrentPublish = m_kickerCurrentTopic.publish();
+
         m_kickerActualRPMTopic = m_globalNT.getDoubleTopic("dump/kicker/actualRPM");
         m_kickerActualRPMPublish = m_kickerActualRPMTopic.publish();
 
@@ -79,6 +85,7 @@ public class DumpNT extends Dump {
         m_kickerTargetRPMPublish.set(super.getKickerTargetRPM());
 
         m_rollerActualRPMPublish.set(super.getRollerRPM());
+        m_kickerCurrentPublish.set(super.getKickerCurrent());
         m_kickerActualRPMPublish.set(super.getKickerRPM());
 
         m_floorTargetVoltagePublish.set(super.getFloorTargetVoltage());

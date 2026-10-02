@@ -153,6 +153,10 @@ public class Dump extends SubsystemBase {
     return m_floorTargetVoltage;
   }
 
+  public double getKickerCurrent(){
+    return m_kicker.getSupplyCurrent().getValueAsDouble();
+  }
+
   @Override
   public void periodic() {
     m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
