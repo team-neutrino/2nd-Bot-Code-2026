@@ -180,7 +180,7 @@ public class Dump extends SubsystemBase {
 
   public Command setKickerRPM(double rpm) {
     return startEnd(() -> {
-      m_kickerTargetRPM = rpm;
+      m_kickerTargetRPM = -rpm;
     }, () -> {
       m_kickerTargetRPM = 0;
     });
@@ -196,7 +196,7 @@ public class Dump extends SubsystemBase {
 
   public Command runAll(double kickerRpm, double rollerRpm, double voltage) {
     return startEnd(() -> {
-      m_kickerTargetRPM = kickerRpm;
+      m_kickerTargetRPM = -kickerRpm;
       m_rollerTargetRPM = rollerRpm;
       m_floorTargetVoltage = voltage;
     }, () -> {
