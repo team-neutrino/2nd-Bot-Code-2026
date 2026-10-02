@@ -25,7 +25,6 @@ public class Dump extends SubsystemBase {
   private TalonFX m_rightRoller;
   private TalonFX m_rightRollerFollow;
   private TalonFX m_kicker;
-  private TalonFX m_kickerFollow;
   private TalonFX m_floor;
 
   private TalonFXConfiguration m_rollerConfig = new TalonFXConfiguration();
@@ -33,7 +32,6 @@ public class Dump extends SubsystemBase {
   private TalonFXConfiguration m_rightRollerConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_kickerConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_rollerFollowerConfig = new TalonFXConfiguration();
-  private TalonFXConfiguration m_kickerFollowerConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_floorConfig = new TalonFXConfiguration();
 
   private CurrentLimitsConfigs m_rollerCurrentConfig;
@@ -51,13 +49,13 @@ public class Dump extends SubsystemBase {
   public Dump() {
     m_rollerCurrentConfig = new CurrentLimitsConfigs();
     m_kickerCurrentConfig = new CurrentLimitsConfigs();
+    m_floorCurrentConfig = new CurrentLimitsConfigs();
 
     m_leftRoller = new TalonFX(LEFT_ROLLER_ID, RIO_BUS);
     m_leftRollerFollow = new TalonFX(LEFT_ROLLER_FOLLOWER_ID, RIO_BUS);
     m_rightRoller = new TalonFX(RIGHT_ROLLER_ID, RIO_BUS);
     m_rightRollerFollow = new TalonFX(RIGHT_ROLLER_FOLLOWER_ID, RIO_BUS);
     m_kicker = new TalonFX(KICKER_ID, RIO_BUS);
-    m_kickerFollow = new TalonFX(KICKER_FOLLOWER_ID, RIO_BUS);
     m_floor = new TalonFX(FLOOR_ID, RIO_BUS);
 
     m_rollerCurrentConfig.withSupplyCurrentLimit(ROLLER_CURRENT_LIMIT).withSupplyCurrentLimitEnable(true)
@@ -74,10 +72,10 @@ public class Dump extends SubsystemBase {
     m_rollerConfig.CurrentLimits = m_rollerCurrentConfig;
 
     m_leftRollerConfig = m_rollerConfig.clone();
-    m_leftRollerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    m_leftRollerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     m_rightRollerConfig = m_rollerConfig.clone();
-    m_rightRollerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    m_rightRollerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     m_rollerFollowerConfig.CurrentLimits = m_rollerCurrentConfig;
 
@@ -87,15 +85,12 @@ public class Dump extends SubsystemBase {
     m_kickerConfig.Slot0.kV = KICKER_KV;
     m_kickerConfig.CurrentLimits = m_kickerCurrentConfig;
 
-    m_kickerFollowerConfig.CurrentLimits = m_kickerCurrentConfig;
-
     m_floorConfig.CurrentLimits = m_floorCurrentConfig;
 
     // TODO: change brake/coast values depending on what we need
     m_rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_rollerFollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    m_kickerFollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_floorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     m_leftRoller.getConfigurator().apply(m_leftRollerConfig);
@@ -104,7 +99,6 @@ public class Dump extends SubsystemBase {
     m_rightRollerFollow.getConfigurator().apply(m_rollerFollowerConfig);
 
     m_kicker.getConfigurator().apply(m_kickerConfig);
-    m_kickerFollow.getConfigurator().apply(m_kickerFollowerConfig);
 
     m_floor.getConfigurator().apply(m_floorConfig);
 
@@ -112,8 +106,6 @@ public class Dump extends SubsystemBase {
     m_leftRollerFollow.setControl(leftFollowReq);
     Follower rightFollowReq = new Follower(RIGHT_ROLLER_ID, MotorAlignmentValue.Aligned);
     m_rightRollerFollow.setControl(rightFollowReq);
-    Follower floorFollowReq = new Follower(FLOOR_ID, MotorAlignmentValue.Opposed);
-    m_kickerFollow.setControl(floorFollowReq);
 
     m_rollerVelControl = new VelocityVoltage(0);
     m_kickerVelControl = new VelocityVoltage(0);
@@ -161,6 +153,16 @@ public class Dump extends SubsystemBase {
     return m_floorTargetVoltage;
   }
 
+  @Override
+  public void periodic() {
+    m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+    m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+
+    m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
+
+    m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
+  }
+
   public Command stopCommand() {
     return run(() -> {
       m_rollerTargetRPM = 0;
@@ -203,15 +205,5 @@ public class Dump extends SubsystemBase {
       m_floorTargetVoltage = 0;
     });
 
-  }
-
-  @Override
-  public void periodic() {
-    m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
-    m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
-
-    m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
-
-    m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
   }
 }
