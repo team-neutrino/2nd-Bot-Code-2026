@@ -38,13 +38,13 @@ public class Constants {
         public static final double ROLLER_KD = 0;
         public static final double ROLLER_KV = .1;
 
-        public static final double KICKER_KP = 3;
+        public static final double KICKER_KP = 1;
         public static final double KICKER_KI = 0;
         public static final double KICKER_KD = 0;
         public static final double KICKER_KV = .5;
 
         public static final double DEFAULT_ROLLER_RPM = 1000;
-        public static final double DEFAULT_KICKER_RPM = 3000;
+        public static final double DEFAULT_KICKER_RPM = 1000;
 
         public static final double DEFAULT_FLOOR_VOLTAGE = 6;
     }
