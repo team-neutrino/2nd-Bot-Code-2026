@@ -30,23 +30,24 @@ public class Constants {
         public static final int FLOOR_ID = 26;
 
         public static final int ROLLER_CURRENT_LIMIT = 40;
-        public static final int KICKER_CURRENT_LIMIT = 40;
+        public static final int KICKER_CURRENT_LIMIT = 80;
         public static final int FLOOR_CURRENT_LIMIT = 30;
 
-        public static final double ROLLER_KP = .1;
+        public static final double ROLLER_KP = 0.08;
         public static final double ROLLER_KI = 0;
         public static final double ROLLER_KD = 0;
-        public static final double ROLLER_KV = .1;
+        public static final double ROLLER_KV = 0.1225;
 
-        public static final double KICKER_KP = 1;
+        public static final double KICKER_KP = 1.5;
         public static final double KICKER_KI = 0;
         public static final double KICKER_KD = 0;
-        public static final double KICKER_KV = .5;
+        public static final double KICKER_KV = 0.35;
 
-        public static final double DEFAULT_ROLLER_RPM = 1000;
-        public static final double DEFAULT_KICKER_RPM = 1000;
+        public static final double DEFAULT_ROLLER_RPM = 4300; // 4k real target need to retune
+        public static final double DEFAULT_KICKER_RPM = 4000;
 
-        public static final double DEFAULT_FLOOR_VOLTAGE = 6;
+        public static final double DEFAULT_FLOOR_VOLTAGE = 11.5;
+        public static final double DEFAULT_KICKER_VOLTAGE = 11.5;
     }
 
     public static class IntakeConstants {

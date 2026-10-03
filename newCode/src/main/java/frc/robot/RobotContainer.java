@@ -22,31 +22,35 @@ import frc.robot.util.Subsystems;
 import static frc.robot.util.Subsystems.*;
 
 public class RobotContainer {
-        private Subsystems m_subsystemContainer;
+    private Subsystems m_subsystemContainer;
 
     private final CommandXboxController m_driverController = new CommandXboxController(0);
     private final CommandXboxController m_buttonController = new CommandXboxController(1);
 
-        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-        public RobotContainer() {
-                m_subsystemContainer = new Subsystems();
-                configureBindings();
-                setDefaultCommands();
-        }
+    public RobotContainer() {
+        m_subsystemContainer = new Subsystems();
+        configureBindings();
+        setDefaultCommands();
+    }
 
     private void configureBindings() {
         m_driverController.back().whileTrue(swerve.resetYaw());
-        m_driverController.leftTrigger().whileTrue(swerve.slowSwerveDrive(m_driverController));
-        m_driverController.rightTrigger().whileTrue(swerve.slowestSwerveDrive(m_driverController));
+        m_driverController.povLeft().whileTrue(swerve.slowSwerveDrive(m_driverController));
+        m_driverController.povRight().whileTrue(swerve.slowestSwerveDrive(m_driverController));
 
-        m_buttonController.leftBumper().whileTrue(IntakeFactory.runIntake());
-        m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
-        m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
-        m_buttonController.x().whileTrue(DumpFactory.runAll()); // aka "shoot"
+        m_driverController.leftBumper().whileTrue(IntakeFactory.runIntake());
+        m_driverController.leftTrigger().onTrue(intake.toggleIntake());
+        m_driverController.rightBumper().whileTrue(IntakeFactory.runOuttake());
+        m_driverController.x().whileTrue(DumpFactory.runAll()); // aka "shoot"
+        m_driverController.y().whileTrue(DumpFactory.runAtAdjustableRPM()); // aka "shoot" adust
+
+        m_driverController.povUp().onTrue(DumpFactory.incrementAdjustableRPM());
+        m_driverController.povDown().onTrue(DumpFactory.decrementAdjustableRPM());
     }
 
-    public void setDefaultCommands(){
+    public void setDefaultCommands() {
         intake.setDefaultCommand(intake.defaultCommand());
         swerve.setDefaultCommand(swerve.swerveDefaultCommand(m_driverController));
     }

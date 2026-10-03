@@ -86,7 +86,7 @@ public class DumpNT extends Dump {
 
         m_rollerActualRPMPublish.set(super.getRollerRPM());
         m_kickerCurrentPublish.set(super.getKickerCurrent());
-        m_kickerActualRPMPublish.set(super.getKickerRPM());
+        m_kickerActualRPMPublish.set(-super.getKickerRPM());
 
         m_floorTargetVoltagePublish.set(super.getFloorTargetVoltage());
 

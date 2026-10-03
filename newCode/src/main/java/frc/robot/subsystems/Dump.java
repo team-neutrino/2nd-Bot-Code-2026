@@ -46,6 +46,9 @@ public class Dump extends SubsystemBase {
   private VelocityVoltage m_kickerVelControl;
   private VoltageOut m_floorVoltageOut;
 
+  private double adjustableTargetRPM = 4000;
+  private boolean isAdjusting = false;
+
   public Dump() {
     m_rollerCurrentConfig = new CurrentLimitsConfigs();
     m_kickerCurrentConfig = new CurrentLimitsConfigs();
@@ -146,25 +149,40 @@ public class Dump extends SubsystemBase {
   }
 
   public double getKickerTargetRPM() {
-    return m_rollerTargetRPM;
+    return m_kickerTargetRPM;
   }
 
   public double getFloorTargetVoltage() {
     return m_floorTargetVoltage;
   }
 
-  public double getKickerCurrent(){
+  public double getKickerCurrent() {
     return m_kicker.getSupplyCurrent().getValueAsDouble();
+    // return m_kicker.getStatorCurrent().getValueAsDouble();
+
+  }
+
+  public double getAdjustableTargetRPM() {
+    return adjustableTargetRPM;
   }
 
   @Override
   public void periodic() {
-    m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
-    m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+    if (m_rollerTargetRPM == 0) {
+      m_leftRoller.stopMotor();
+      m_rightRoller.stopMotor();
+    } else {
+      m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+      m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
+    }
 
-    m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
-
-    m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
+    if (m_kickerTargetRPM == 0) {
+      m_kicker.stopMotor();
+    } else if (getRollerRPM() > 3500) {
+      // m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
+      m_kicker.setVoltage(-DEFAULT_KICKER_VOLTAGE);
+      m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
+    }
   }
 
   public Command stopCommand() {
@@ -208,6 +226,38 @@ public class Dump extends SubsystemBase {
       m_rollerTargetRPM = 0;
       m_floorTargetVoltage = 0;
     });
+  }
 
+  public Command runAdjust(double kickerRpm, double adjustRPM, double voltage) {
+    return startEnd(() -> {
+      m_kickerTargetRPM = -kickerRpm;
+      m_rollerTargetRPM = adjustableTargetRPM;
+      m_floorTargetVoltage = voltage;
+    }, () -> {
+      m_kickerTargetRPM = 0;
+      m_rollerTargetRPM = 0;
+      m_floorTargetVoltage = 0;
+    });
+  }
+
+  public Command incrementAdjustableTargetRPM() {
+    // adjustableTargetRPM += 100;
+    return runOnce(() -> {
+      adjustableTargetRPM += 100;
+    });
+
+  }
+
+  public Command decrementAdjustableTargetRPM() {
+    // adjustableTargetRPM -= 100;
+    return runOnce(() -> {
+      adjustableTargetRPM -= 100;
+    });
+  }
+
+  public Command changeAdjusting() {
+    return runOnce(() -> {
+      isAdjusting = !isAdjusting;
+    });
   }
 }
