@@ -40,14 +40,15 @@ public class RobotContainer {
         m_driverController.povLeft().whileTrue(swerve.slowSwerveDrive(m_driverController));
         m_driverController.povRight().whileTrue(swerve.slowestSwerveDrive(m_driverController));
 
-        m_driverController.leftBumper().whileTrue(IntakeFactory.runIntake());
-        m_driverController.leftTrigger().onTrue(intake.toggleIntake());
-        m_driverController.rightBumper().whileTrue(IntakeFactory.runOuttake());
         m_driverController.x().whileTrue(DumpFactory.runAll()); // aka "shoot"
         m_driverController.y().whileTrue(DumpFactory.runAtAdjustableRPM()); // aka "shoot" adust
 
-        m_driverController.povUp().onTrue(DumpFactory.incrementAdjustableRPM());
-        m_driverController.povDown().onTrue(DumpFactory.decrementAdjustableRPM());
+        m_buttonController.povUp().onTrue(dump.incrementAdjustableTargetRPM());
+        m_buttonController.povDown().onTrue(dump.decrementAdjustableTargetRPM());
+
+        m_buttonController.leftBumper().whileTrue(IntakeFactory.runIntake());
+        m_buttonController.leftTrigger().onTrue(intake.toggleIntake());
+        m_buttonController.rightBumper().whileTrue(IntakeFactory.runOuttake());
     }
 
     public void setDefaultCommands() {

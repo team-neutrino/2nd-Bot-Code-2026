@@ -36,12 +36,4 @@ public class DumpFactory {
     public static Command runAtAdjustableRPM() {
         return dump.runAdjust(DEFAULT_KICKER_RPM, dump.getAdjustableTargetRPM(), DEFAULT_FLOOR_VOLTAGE);
     }
-
-    public static Command incrementAdjustableRPM() {
-        return dump.incrementAdjustableTargetRPM();
-    }
-
-    public static Command decrementAdjustableRPM() {
-        return dump.decrementAdjustableTargetRPM();
-    }
 }
