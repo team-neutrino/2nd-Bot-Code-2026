@@ -241,7 +241,6 @@ public class Dump extends SubsystemBase {
   }
 
   public Command incrementAdjustableTargetRPM() {
-    // adjustableTargetRPM += 100;
     return runOnce(() -> {
       adjustableTargetRPM += 100;
     });
@@ -249,15 +248,8 @@ public class Dump extends SubsystemBase {
   }
 
   public Command decrementAdjustableTargetRPM() {
-    // adjustableTargetRPM -= 100;
     return runOnce(() -> {
       adjustableTargetRPM -= 100;
-    });
-  }
-
-  public Command changeAdjusting() {
-    return runOnce(() -> {
-      isAdjusting = !isAdjusting;
     });
   }
 }
