@@ -27,6 +27,7 @@ public class Intake extends SubsystemBase {
 
   private PositionVoltage m_deployPositionControl;
   private VoltageOut m_rollerVoltageControl;
+  private final VoltageOut m_deployBangBangControl = new VoltageOut(0);
 
   private double m_rollerMotorVoltage;
   private double m_targetDeployAngle;
@@ -92,7 +93,19 @@ public class Intake extends SubsystemBase {
   }
 
   private void moveToIntake(double targetPosition) {
-    m_deployMotor.setControl(m_deployPositionControl.withPosition(targetPosition));
+    // *************************************************************************
+    // Bang-bang controller
+    final double measured_position = getMotorAngle();
+    double arm_volts = 0.0;
+
+    if (measured_position < targetPosition) {
+      arm_volts = 10.0;
+    } else if (measured_position > targetPosition) {
+      arm_volts = -10.0;
+    }
+
+    m_deployMotor.setControl(m_deployBangBangControl.withOutput(arm_volts));
+    // *************************************************************************
   }
 
   private void spinRoller(double voltage) {

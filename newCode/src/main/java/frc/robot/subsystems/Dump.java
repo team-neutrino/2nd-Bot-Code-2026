@@ -45,6 +45,7 @@ public class Dump extends SubsystemBase {
   private VelocityVoltage m_rollerVelControl;
   private VelocityVoltage m_kickerVelControl;
   private VoltageOut m_floorVoltageOut;
+  private final VoltageOut m_rollerBangBang = new VoltageOut(0);
 
   private double adjustableTargetRPM = 4000;
   private boolean isAdjusting = false;
@@ -168,17 +169,23 @@ public class Dump extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_rollerTargetRPM == 0) {
-      m_leftRoller.stopMotor();
-      m_rightRoller.stopMotor();
-    } else {
-      m_leftRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
-      m_rightRoller.setControl(m_rollerVelControl.withVelocity(m_rollerTargetRPM / 60));
-    }
 
+    // *************************************************************************
+    // Bang-bang controller:
+    final double measured_speed = getRollerRPM();
+    double roller_volts = 0.0;
+
+    if (measured_speed < m_rollerTargetRPM) {
+      roller_volts = 12.0;
+    }
+    m_leftRoller.setControl(m_rollerBangBang.withOutput(roller_volts));
+    m_rightRoller.setControl(m_rollerBangBang.withOutput(roller_volts));
+    // *************************************************************************
+
+    // kicker and floor control
     if (m_kickerTargetRPM == 0) {
       m_kicker.stopMotor();
-    } else if (getRollerRPM() > 3500) {
+    } else if (measured_speed > 3500) {
       // m_kicker.setControl(m_kickerVelControl.withVelocity(m_kickerTargetRPM / 60));
       m_kicker.setVoltage(-DEFAULT_KICKER_VOLTAGE);
       m_floor.setControl(m_floorVoltageOut.withOutput(m_floorTargetVoltage));
